@@ -52,3 +52,49 @@ template showView(point: Point,writeAccess: Bool){
 		}
 	}
 }
+
+page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
+	h1{"ToDoList"}
+	h3{"Create point"}
+	var point := Point{}
+	submit action{return root();}{"Back"}
+	form {
+		div[style := "display: flex; flex-direction: column;"]{
+		label( "Name: " ){ input( point.name )}
+		label( "Assigned: " ){ input( point.assigned ) }
+		label( "Priority: "){ input(point.priority) }
+		label( "Description: " ){ input( point.description ) }
+		label( "URL: " ){ input( point.url ) }
+		label( "Due: " ){ input( point.dueTime ) }
+		label( "Image: "){ input(point.img) }
+		submit action{
+			point.parentGroup := pg;
+			point.save();
+			pg.points.add(point);
+			return pointListPage(pg.parentList);
+		} { "Save" }}
+	}
+}
+
+page editPoint(point: Point,writeAccess: Bool, owner: Bool){
+	h1{"ToDoList"}
+	h3{text("Edit point"+point.name)}
+	navigate(pointListPage(point.parentGroup.parentList)) { "Back" } 
+	form {
+		div[style := "display: flex; flex-direction: column;"]{	
+				label( "Name: " ){ input( point.name )[not null] }
+				label( "Assigned: " ){ input( point.assigned ) }
+				label( "Priority: "){ input(point.priority) }
+				label( "Done: "){ input(point.done) 
+				label( "Description: " ){ input( point.description ) }
+				label( "URL: " ){ input( point.url ) }
+				label( "Due: " ){ input( point.dueTime ) }
+				label( "Image: "){ input(point.img) }
+				submit action{
+					point.save();
+					return pointListPage(point.parentGroup.parentList);
+				} { "Save" }
+			}
+		}
+	}
+}
