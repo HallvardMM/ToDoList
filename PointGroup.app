@@ -16,7 +16,7 @@ section PointGroup-controller
 
 template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 	div[style := "display: flex;"]{
-		h3{output(pg.name)}
+		h5{output(pg.name)}
 		if(writeAccess){
 			submit action{
 					return addPoint(pg,writeAccess,owner);

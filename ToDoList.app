@@ -1,9 +1,11 @@
 application ToDoList
 
 imports mdl
+imports User
 imports Point
 imports PointGroup
 imports PointList
+
 
 section access control
 
@@ -13,6 +15,7 @@ access control rules
 
 rule page root(){ true }
 rule page createUser(){ true }
+rule page profilePage(u:User){u ==securityContext.principal}
 rule page adminPage(){principal.admin}
 rule page pointListPage(p:PointList){
 	(p.owner==securityContext.principal || securityContext.principal in p.writer || securityContext.principal in p.reader)
@@ -28,22 +31,6 @@ rule page accessListPage(p: PointList, owner: User){
 }
 
 //rule page *(*) {true} //For development purposes!
-
-section ToDoList-model
-
-entity User{
-  name:: String (id, searchable)
-  password:: Secret ( validate(password.length() >= 10, "Minimum password length is 10." ) )
-  email:: Email
-  admin:: Bool
-  ownerList <> {PointList} (inverse=PointList.owner)
-  writeList -> {PointList} (inverse=PointList.writer)
-  readList -> {PointList}  (inverse=PointList.reader)
-}
-
-section ToDoList-view
-
-section ToDoList-controller
 
 section root 
 
@@ -66,6 +53,9 @@ template mainTemplate(){
 			return adminPage();
 			}{ "Admin Page"  }
 		}
+	submit action{
+			return profilePage(securityContext.principal);
+			}{ "Profile Page"  }
 	var list := PointList{}
 	form{
 		label("Create new list: "){ input(list.name)[not null] }
@@ -133,51 +123,6 @@ template mainTemplate(){
 
 
 section pages
-
-page adminPage(){
-	h1{"ToDo List"}
-	h3{ "Admin" }
-	submit action{return root();}{"Return To Home Page"}	
-	for (u:User){
-		div[style := "display: flex;"]{
-			form {
-			output("Id: "+u.id)
-			label( "Name: " ){ input( u.name ) }
-		    label( "Email: " ){ input( u.email ) }
-		    label( "Admin: " ){ input( u.admin ) }
-		    output("Created: "+u.created)
-		    submit action{} { "Save" }
-		}
-		submit action{u.delete();}{"Delete"}
-		}
-	}
-}
-
-
-page createUser(){
-	h1{ "ToDoList" }
-	h3{ "Create user" }
-	var newuser := User{}
-	var passCheck: Secret
-	form{
-		label("Name"){ input(newuser.name) }
-		label("Email"){ input(newuser.email) }
-		label("Password"){ input(newuser.password) }
-		label("Re-enter password"){ input(passCheck)}
-		//captcha() //why does this not work?
-		validate(newuser.password == passCheck, "The passwords are not the same." )
-		submit action{
-			if( (select count(*) from User) == 0 ){
-			newuser.admin := true;
-			}
-			newuser.password := newuser.password.digest(); 
-			newuser.save();
-			// securityContext.principal := newuser; // Logs the user in directly
-			return root();}
-		{"Create"}
-	submit action{return root();}{"Return To Home Page"}	
-	}	
-}
 
 override page accessDenied(){
   maingridcard( "Access Denied" ){

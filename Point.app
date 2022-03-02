@@ -79,7 +79,9 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 page editPoint(point: Point,writeAccess: Bool, owner: Bool){
 	h1{"ToDoList"}
 	h3{text("Edit point"+point.name)}
-	navigate(pointListPage(point.parentGroup.parentList)) { "Back" } 
+	submit action{
+				return pointListPage(point.parentGroup.parentList);
+			} { "Back"  }
 	form {
 		div[style := "display: flex; flex-direction: column;"]{	
 				label( "Name: " ){ input( point.name )[not null] }
