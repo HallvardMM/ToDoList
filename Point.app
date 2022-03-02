@@ -23,6 +23,10 @@ entity Point{
 	assigned -> User // -> should just delete link
 	img:: Image
 	priority -> Priority
+	function toggleDone(){ 
+    	done := !done;
+    	save();
+  	}
 }
 
 section Point-view
@@ -36,12 +40,11 @@ template showView(point: Point,writeAccess: Bool){
 		output( "Description: " + point.description ) 
 		output( "URL: " + point.url ) 
 		output( "Due: " + point.dueTime ) 
-		output( "Image: " + point.img)
+		label( "Image: " ){ output(point.img)}
 		if(writeAccess){
 			output("Done: ")
 			input(point.done)[onclick := action{
-				point.done := !point.done;
-				point.save();
+				point.toggleDone();
 				}]
 		} 
 		else{

@@ -14,6 +14,10 @@ access control rules
 rule page root(){ true }
 rule page createUser(){ true }
 rule page adminPage(){principal.admin}
+rule page pointListPage(p:PointList){
+	(p.owner==securityContext.principal || securityContext.principal in p.writer || securityContext.principal in p.reader)
+}
+
 rule page ownerAccessLists(u:User){
 	u==principal
 }
@@ -23,12 +27,14 @@ rule page writerAccessLists(u:User){
 rule page readerAccessLists(u:User){
 	u==principal
 }
-rule page addPoint(pg: PointGroup, writeAccess: Bool, owner: Bool){ 
-	writeAccess==true
+rule page addPoint(pg: PointGroup, writeAccess: Bool, owner: Bool){
+	(principal == pg.parentList.owner || principal in pg.parentList.writer) && writeAccess==true
 }
-
 rule page editPoint(point: Point,writeAccess: Bool,owner:Bool){
-	writeAccess==true
+	(principal == point.parentGroup.parentList.owner || principal in point.parentGroup.parentList.writer) && writeAccess==true
+}
+rule page accessListPage(p: PointList, owner: User){
+	owner == principal
 }
 
 //rule page *(*) {true} //For development purposes!
@@ -36,7 +42,7 @@ rule page editPoint(point: Point,writeAccess: Bool,owner:Bool){
 section ToDoList-model
 
 entity User{
-  name:: String (id)
+  name:: String (id, searchable)
   password:: Secret ( validate(password.length() >= 10, "Minimum password length is 10." ) )
   email:: Email
   admin:: Bool
@@ -57,29 +63,31 @@ page root(){
 		mainTemplate(){}
 	}
 	else{
-		authentication //default authentication
+		//authentication //default authentication not used
+		logintemplate
 		navigate(createUser()) { "Create user" } 
 	}
 }
 
 template mainTemplate(){
+	logout()
 	if(principal.admin){
-			navigate(adminPage()) { "Admin Page" } 
+		submit action{
+			return adminPage();
+			}{ "Admin Page"  }
 		}
 	div[style := "display: flex; flex-direction: column;"]{
 		navigate(ownerAccessLists(securityContext.principal)){"Owner accsess lists"}
 		navigate(writerAccessLists(securityContext.principal)){"Writer accsess lists"}
 		navigate(readerAccessLists(securityContext.principal)){"Reader accsess lists"}
 	}
-		
-	logout()
 }
 
 
 section pages
 
 page adminPage(){
-	h1{"ToDoList"}
+	h1{"ToDo List"}
 	h3{ "Admin" }
 	navigate root() { "Return To Home Page" }	
 	for (u:User){
@@ -107,7 +115,7 @@ page createUser(){
 		label("Name"){ input(newuser.name) }
 		label("Email"){ input(newuser.email) }
 		label("Password"){ input(newuser.password) }
-		label("Re-enter password"){ input(passCheck) }
+		label("Re-enter password"){ input(passCheck)}
 		//captcha() //why does this not work?
 		validate(newuser.password == passCheck, "The passwords are not the same." )
 		submit action{
@@ -122,7 +130,6 @@ page createUser(){
 	navigate root() { "Return To Home Page" }	
 	}	
 }
-
 
 page ownerAccessLists(user: User){
 	h1{"ToDo List"}
@@ -143,7 +150,6 @@ page ownerAccessLists(user: User){
 		{"Create"}
 	}	
 	for(todolist in user.ownerList){
-		//TODO: share access
 		PointListTemplate(todolist)
 	}
 	navigate root() { "Return To Home Page" }
@@ -156,6 +162,12 @@ page writerAccessLists(user: User){
 	
 	for(todolist in user.writeList){
 		PointListTemplate(todolist)
+		submit action{
+				todolist.writer.remove(user);
+				securityContext.principal.writeList.remove(todolist);
+				todolist.save();
+				securityContext.principal.save();
+	   		}{"Leave list"}
 	}
 	navigate root() { "Return To Home Page" }	
 }
@@ -165,6 +177,12 @@ page readerAccessLists(user: User){
 	h3{"Read accsess lists"}
 	for(todolist in securityContext.principal.readList){
 		PointListTemplate(todolist)
+		submit action{
+				todolist.reader.remove(user);
+				securityContext.principal.readList.remove(todolist);
+				todolist.save();
+				securityContext.principal.save();
+	   		}{"Leave list"}
 	}
 	navigate root() { "Return To Home Page" }	
 }
@@ -190,7 +208,7 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 	
 	form {
 		div[style := "display: flex; flex-direction: column;"]{
-		label( "Name: " ){ input( point.name )[not null] }
+		label( "Name: " ){ input( point.name )}
 		label( "Assigned: " ){ input( point.assigned ) }
 		label( "Priority: "){ input(point.priority) }
 		label( "Description: " ){ input( point.description ) }
@@ -252,3 +270,22 @@ override template logout() {
    	form{ submit action{ securityContext.principal := null; }{ "Logout" } }
    	}
  }
+
+template logintemplate() {
+  var name: String
+  var pass: Secret
+  var stayLoggedIn := false
+  form {
+    grid{
+      cell(12){ label( "Name: " ){ input(name)}}
+      cell(12){ label( "Password: " ){ input(pass)}}
+      cell(12){ label( "Stay logged in: " ){input(stayLoggedIn)}}
+      cell(12){ submit signinAction() { "Login" }}
+    }
+  }
+  action signinAction() {
+    validate( authenticate(name,pass), "The login credentials are not valid." );
+    getSessionManager().stayLoggedIn := stayLoggedIn;
+    return root();
+  }
+}

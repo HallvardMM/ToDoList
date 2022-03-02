@@ -88,6 +88,57 @@ template card(title: String){
   </div>
 }
 
+// template popUp(title: String, buttonText: String){
+//   <style>
+//     .mdl-popup {
+//       position:absolute;
+//       top:50%;
+// 	  left:50%;
+// 	  width:400px;  /* adjust as per your needs */
+// 	  height:400px; /* adjust as per your needs */
+// 	  margin-left:-200px;   /* negative half of width above */
+// 	  margin-top:-200px;   /* negative half of height above */
+// 	  z-index: 999999;
+// 	  border-radius: 25px;
+//   	  border: 2px solid #000000;
+//       & > .mdl-card__actions {
+//         display: flex;
+//         box-sizing: border-box;
+//         align-items: center;
+//       }
+//       & > .mdl-card__title {
+//         align-items: flex-start;
+//         & > h4 {
+//           margin-top: 0;
+//         }
+//       }
+//       & > .mdl-card__title,
+//       & > .mdl-card__supporting-text,
+//       & > .mdl-card__actions,
+//       & > .mdl-card__actions > .mdl-button {
+//         color: #fff;
+//       }
+//     }
+//   </style>
+//   <div class="mdl-popup mdl-shadow--4dp mdl-cell mdl-cell--12-col" all attributes>
+//     <div class="mdl-card__title">
+//       output(title)
+//     </div>
+//     <div class="mdl-card__supporting-text">
+//       elements
+//     </div>
+//   </div>
+// }
+
+template toggleVisibility( initialText: String){
+  <button  onclick="$( '#" + id + "' ).toggle();">
+    output( initialText )
+  </button>
+  <div id=id style="display:none;">
+    elements
+  </div>
+}
+
 
 section head
 
