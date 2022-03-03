@@ -89,6 +89,7 @@ template card(title: String){
 }
 
 template toggleVisibility( startText: String, toggleText: String){
+	//template for hidding/showing and chaning text on button
   <script>
   	function toggleText(e, startText, toggleText){
   		if(e[0].innerHTML == startText){

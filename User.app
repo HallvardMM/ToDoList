@@ -24,7 +24,7 @@ page createUser(){
 		label("Email"){ input(newuser.email) }
 		label("Password"){ input(newuser.password) }
 		label("Re-enter password"){ input(passCheck)}
-		//captcha() //why does this not work?
+		//captcha() //Tried to use captcha, but based on talk I skipped it since using GoogleApi was recommended
 		validate(newuser.password == passCheck, "The passwords are not the same." )
 		submit action{
 			if( (select count(*) from User) == 0 ){
