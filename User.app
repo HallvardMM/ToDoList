@@ -34,9 +34,9 @@ page createUser(){
 			newuser.save();
 			// securityContext.principal := newuser; // Logs the user in directly
 			return root();}
-		{"Create"}
-	submit action{return root();}{"Return To Home Page"}	
+		{"Create"}	
 	}	
+	submit action{return root();}{"Return To Home Page"}
 }
 
 page adminPage(){

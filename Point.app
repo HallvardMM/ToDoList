@@ -37,10 +37,6 @@ template showView(point: Point,writeAccess: Bool){
 		output( "Name: " + point.name )
 		output( "Assigned: " + point.assigned.name )
 		output( "Priority: " + point.priority.name)
-		output( "Description: " + point.description ) 
-		output( "URL: " + point.url ) 
-		output( "Due: " + point.dueTime ) 
-		label( "Image: " ){ output(point.img)}
 		if(writeAccess){
 			output("Done: ")
 			input(point.done)[onclick := action{
@@ -49,6 +45,12 @@ template showView(point: Point,writeAccess: Bool){
 		} 
 		else{
 			output( "Done: " + point.done)
+		}
+		toggleVisibility("v","^"){
+			output( "Description: " + point.description ) 
+			output( "URL: " + point.url ) 
+			output( "Due: " + point.dueTime ) 
+			label( "Image: " ){ output(point.img)}
 		}
 	}
 }

@@ -10,7 +10,7 @@ entity PointList{
 	pointGroups <> {PointGroup} (inverse=PointGroup.parentList)
 }
 
-entity ShareAccess {
+entity ShareAccess{
 	name: String
 }
 
@@ -52,31 +52,33 @@ page pointListPage(p:PointList){
 		submit action{
 			return accessListPage(p, p.owner);
    		}{ "Change access" }
-		form{
-			// TODO: User should not see themselves
-			div[style := "display: flex;"]{
-				label("User: "){ inputajax(user){ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
-				label("Rights: "){ inputajax(share){ validate(share.name.length()>0,"Choose access!")}}
-				submit action{
-					if(share.name == "Write"){
-						if(user in p.reader){
-							user.readList.remove(p);
-							p.reader.remove(user);
+   		toggleVisibility("Share access","Hide share"){
+			form{
+				// TODO: User should not see themselves
+				div[style := "display: flex;"]{
+					label("User: "){ inputajax(user){ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+					label("Rights: "){ inputajax(share){ validate(share.name.length()>0,"Choose access!")}}
+					submit action{
+						if(share.name == "Write"){
+							if(user in p.reader){
+								user.readList.remove(p);
+								p.reader.remove(user);
+							}
+							p.writer.add(user);
+							user.writeList.add(p);
 						}
-						p.writer.add(user);
-						user.writeList.add(p);
-					}
-					else{
-						if(user in p.writer){
-							user.writeList.remove(p);
-							p.writer.remove(user);
+						else{
+							if(user in p.writer){
+								user.writeList.remove(p);
+								p.writer.remove(user);
+							}
+							p.reader.add(user);
+							user.readList.add(p);
 						}
-						p.reader.add(user);
-						user.readList.add(p);
-					}
-				}{"Give access"}
-			}
-		} 
+					}{"Give access"}
+				}
+			} 
+		}
 	}
    	if(owner || writer){
    		AddGroup(p)

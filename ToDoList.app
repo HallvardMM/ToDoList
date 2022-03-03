@@ -73,9 +73,8 @@ template mainTemplate(){
 		h3{"Owner accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.ownerList){
-				div[style := "display: flex; flex-direction: row;"]{ label( todolist.name+": " ){ 
-					submit action{return pointListPage(todolist);}{"To list"}
-					}
+				div[style := "display: flex; flex-direction: row;"]{
+					navigate(pointListPage(todolist)){output(todolist.name)} 
 					submit action{
 						for(w in todolist.writer){
 							w.writeList.remove(todolist);
@@ -92,10 +91,9 @@ template mainTemplate(){
 		h3{"Writer accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.writeList){
-				div[style := "display: flex; flex-direction: row;"]{label( todolist.name+": " ){ 
-					submit action{return pointListPage(todolist);}{"To list"}  
-					}
-				submit action{
+				div[style := "display: flex; flex-direction: row;"]{
+					navigate(pointListPage(todolist)){output(todolist.name)} 
+					submit action{
 						todolist.writer.remove(securityContext.principal);
 						securityContext.principal.writeList.remove(todolist);
 						todolist.save();
@@ -107,10 +105,9 @@ template mainTemplate(){
 		h3{"Reader accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.readList){
-				div[style := "display: flex; flex-direction: row;"]{label( todolist.name+": " ){ 
-					submit action{return pointListPage(todolist);}{"To list"}  
-					}
-				submit action{
+				div[style := "display: flex; flex-direction: row;"]{
+					navigate(pointListPage(todolist)){output(todolist.name)}  
+					submit action{
 						todolist.reader.remove(securityContext.principal);
 						securityContext.principal.readList.remove(todolist);
 						todolist.save();

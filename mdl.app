@@ -88,9 +88,19 @@ template card(title: String){
   </div>
 }
 
-template toggleVisibility( text: String){
-  <button  onclick="$( '#" + id + "' ).toggle();">
-    output( text )
+template toggleVisibility( startText: String, toggleText: String){
+  <script>
+  	function toggleText(e, startText, toggleText){
+  		if(e[0].innerHTML == startText){
+  			$( "#" + e[0].id).text(toggleText)
+  		}
+  		else{
+  			$( "#" + e[0].id).text(startText)
+  		}
+  	}
+  </script>
+ <button id=id+"button" onclick="$( '#" + id + "' ).toggle(); toggleText($(this), '~startText','~toggleText'); ">
+    output( startText )
   </button>
   <div id=id style="display:none;">
     elements
