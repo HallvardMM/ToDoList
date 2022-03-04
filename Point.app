@@ -1,8 +1,10 @@
-module Point
+//A point to refer to a task/work in a todolist
 
+module Point
 
 section Point-model
 
+//Arrange the priority of points
 entity Priority {
 	name: String
 }
@@ -46,7 +48,7 @@ template showView(point: Point,writeAccess: Bool){
 		else{
 			output( "Done: " + point.done)
 		}
-		toggleVisibility("v","^"){
+		toggleVisibility("v	","^"){
 			output( "Description: " + point.description ) 
 			output( "URL: " + point.url ) 
 			output( "Due: " + point.dueTime ) 
