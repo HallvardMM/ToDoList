@@ -45,82 +45,86 @@ page pointListPage(p:PointList){
 	var writer := (securityContext.principal in p.writer)
 	var user : User
 	var share : ShareAccess
-	h1{"ToDo List"}
-   	h2{output(p.name)}
-   	submit action{return root();}{"Back"}
-   	if(owner){
-		submit action{
-			return accessListPage(p, p.owner);
-   		}{ "Change access" }
-   		toggleVisibility("Share access","Hide share"){
-			form{
-				// TODO: User should not see themselves
-				div[style := "display: flex;"]{
-					label("User: "){ inputajax(user){ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
-					label("Rights: "){ inputajax(share){ validate(share.name.length()>0,"Choose access!")}}
-					submit action{
-						if(share.name == "Write"){
-							if(user in p.reader){
-								user.readList.remove(p);
-								p.reader.remove(user);
+	mdlHead( "deep_orange", "deep_purple" )
+	mainLoggedIn(){
+	   	h3{output(p.name)}
+	   	submit action{return root();}{"Back"}
+	   	if(owner){
+			submit action{
+				return accessListPage(p, p.owner);
+	   		}{ "Change access" }
+	   		toggleVisibility("Share access","Hide share"){
+				form{
+					// TODO: User should not see themselves
+					div[style := "display: flex;"]{
+						label("User: "){ inputajax(user){ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+						label("Rights: "){ inputajax(share){ validate(share.name.length()>0,"Choose access!")}}
+						submit action{
+							if(share.name == "Write"){
+								if(user in p.reader){
+									user.readList.remove(p);
+									p.reader.remove(user);
+								}
+								p.writer.add(user);
+								user.writeList.add(p);
 							}
-							p.writer.add(user);
-							user.writeList.add(p);
-						}
-						else{
-							if(user in p.writer){
-								user.writeList.remove(p);
-								p.writer.remove(user);
+							else{
+								if(user in p.writer){
+									user.writeList.remove(p);
+									p.writer.remove(user);
+								}
+								p.reader.add(user);
+								user.readList.add(p);
 							}
-							p.reader.add(user);
-							user.readList.add(p);
-						}
-					}{"Give access"}
-				}
-			} 
+						}{"Give access"}
+					}
+				} 
+			}
 		}
-	}
-   	if(owner || writer){
-   		AddGroup(p)
-   	}
-	for(group in p.pointGroups){
-		PointGroupTemplate(group, (owner || writer), owner)
+	   	if(owner || writer){
+	   		AddGroup(p)
+	   	}
+		for(group in p.pointGroups){
+			PointGroupTemplate(group, (owner || writer), owner)
+		}
 	}
 } 
 
 page accessListPage(p: PointList, owner: User){
-	h1{"ToDo List"}
-	h3{ output("Access: "+p.name)}
-	submit action{return root();}{"Back"}
-	h5{ "Write access"}	
-	for (u in p.writer){
-		div[style := "display: flex;"]{
-			output( u.name )
-		    submit action{
-		    	p.writer.remove(u);
-		    	p.reader.add(u);
-		    	u.writeList.remove(p);
-				u.readList.add(p);
-		    } { "Read access" }
-		    submit action{
-		    	p.writer.remove(u);
-		    	u.writeList.remove(p);
-		    }{"Remove access"}
+	mdlHead( "deep_orange", "deep_purple" )
+		mainLoggedIn(){
+		h3{ output("Access: "+p.name)}
+		submit action{return pointListPage(p);}{"Back"}
+		h5{ "Write access"}	
+		for (u in p.writer){
+			div[style := "display: flex;"]{
+				output( u.name )
+			    submit action{
+			    	p.writer.remove(u);
+			    	p.reader.add(u);
+			    	u.writeList.remove(p);
+					u.readList.add(p);
+			    } { "Read access" }
+			    submit action{
+			    	p.writer.remove(u);
+			    	u.writeList.remove(p);
+			    }{"Remove access"}
+			}
 		}
-	}
-	h5{ "Read access"}	
-	for (u in p.reader){
-		div[style := "display: flex;"]{
-			output( u.name )
-		    submit action{
-		    	p.reader.remove(u);
-		    	p.writer.add(u);
-		    	u.readList.remove(p);
-				u.writeList.add(p);} { "Write access" }
-		    submit action{
-		    	p.reader.remove(u);
-		    	u.readList.remove(p);
-		    }{"Remove access"}
+		h5{ "Read access"}	
+		for (u in p.reader){
+			div[style := "display: flex;"]{
+				output( u.name )
+			    submit action{
+			    	p.reader.remove(u);
+			    	p.writer.add(u);
+			    	u.readList.remove(p);
+					u.writeList.add(p);} { "Write access" }
+			    submit action{
+			    	p.reader.remove(u);
+			    	u.readList.remove(p);
+			    }{"Remove access"}
+			}
 		}
 	}
 }

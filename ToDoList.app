@@ -14,7 +14,7 @@ principal is User with credentials name, password
 access control rules
 
 rule page root(){ true }
-rule page createUser(){ true }
+rule page createUser(){ !loggedIn() }
 rule page profilePage(u:User){u ==securityContext.principal}
 rule page adminPage(){principal.admin}
 rule page pointListPage(p:PointList){
@@ -34,29 +34,48 @@ rule page accessListPage(p: PointList, owner: User){
 
 section root 
 
+template mainLoggedIn(){
+	if(securityContext.principal.admin){
+		 fixedHeader(
+		    "ToDo List",
+		    securityContext.principal,
+		    [
+		      ( navigate(profilePage(securityContext.principal)), "Profile" ),
+		      ( navigate(adminPage()), "Admin" )
+		      
+		    ]
+		  ){
+		    elements
+		  }
+	}else{
+		fixedHeader(
+		    "ToDo List",
+		    securityContext.principal,
+		    [ 
+		      ( navigate(profilePage(securityContext.principal)), "Profile" )
+		    ]
+		  ){
+		    elements
+		  }
+	}
+ 
+}
+
 page root(){
-	h1{"ToDo List"}
+	mdlHead( "deep_orange", "deep_purple" )
 	if(loggedIn()){
-		mainTemplate(){}
+		mainTemplate(){}	
 	}
 	else{
 		//authentication //default authentication not used
 		logintemplate
-		submit action{return createUser();}{"Create user"}
 	}
+	includeJS("")
 }
 
 template mainTemplate(){
-	logout()
-	if(principal.admin){
-		submit action{
-			return adminPage();
-			}{ "Admin Page"  }
-		}
-	submit action{
-			return profilePage(securityContext.principal);
-			}{ "Profile Page"  }
 	var list := PointList{}
+	mainLoggedIn(){
 	form{
 		label("Create new list: "){ input(list.name)[not null] }
 		for(todolist in securityContext.principal.ownerList){
@@ -116,12 +135,14 @@ template mainTemplate(){
 			   	}
 			}
 		}
+	}
 }
 
 
 section pages
 
 override page accessDenied(){
+  mdlHead( "deep_orange", "deep_purple" )
   maingridcard( "Access Denied" ){
     title{ "Access Denied" }
     submit action{return root();}{"Return To Home Page"}
@@ -132,24 +153,28 @@ override page accessDenied(){
 section override default authentication styles
 
 override template logout() {
-  div[style := "display: flex; flex-direction: column;"]{
-   	"Logged in as: " output( securityContext.principal.name ) 
-   	form{ submit action{ securityContext.principal := null; }{ "Logout" } }
-   	}
+   	form{ submit action{ securityContext.principal := null;
+   		return root(); }{ "Logout" } }
+   	
  }
 
 template logintemplate() {
   var name: String
   var pass: Secret
   var stayLoggedIn := false
-  form {
-    grid{
-      cell(12){ label( "Name: " ){ input(name)}}
-      cell(12){ label( "Password: " ){ input(pass)}}
-      cell(12){ label( "Stay logged in: " ){input(stayLoggedIn)}}
-      cell(12){ submit signinAction() { "Login" }}
-    }
+  heading("ToDo List"){
+  	grid{
+  		cell(12){h3{"Sign in"}}
+  		form {
+	      cell(12){ label( "Name: " ){ input(name)}}
+	      cell(12){ label( "Password: " ){ input(pass)}}
+	      cell(12){ label( "Stay logged in: " ){input(stayLoggedIn)}}
+	      cell(12){ submit signinAction() { "Login" }}
+	      cell(12){ submit action{return createUser();}{"Create user"}}
+	    }
+  	}
   }
+  
   action signinAction() {
     validate( authenticate(name,pass), "The login credentials are not valid." );
     getSessionManager().stayLoggedIn := stayLoggedIn;

@@ -15,43 +15,80 @@ template maingridcard(cardtitle: String){
   
 }
 
-// template fixedHeader(title: String, navs: [url: String, linktext: String]){
-//   var homejs := "document.location.href = '"+navigate(root())+"';"
-//   <!-- Always shows a header, even in smaller screens. -->
-//   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-//     <header class="mdl-layout__header">
-//       <div class="mdl-layout__header-row">
-//         <!-- Title -->
-//         <span class="mdl-layout-title" onclick=homejs>
-//           output(title)
-//         </span>
-//         <!-- Add spacer, to align navigation to the right -->
-//         <div class="mdl-layout-spacer"></div>
-//         <!-- Navigation. We hide it in small screens. -->
-//         <nav class="mdl-navigation mdl-layout--large-screen-only">
-//           for(n in navs){
-//             <a class="mdl-navigation__link" href=n.url>output(n.linktext)</a>
-//           }
-//         </nav>
-//       </div>
-//     </header>
-//     <div class="mdl-layout__drawer">
-//       <span class="mdl-layout-title" onclick=homejs>
-//         output(title)
-//       </span>
-//       <nav class="mdl-navigation">
-//         for(n in navs){
-//           <a class="mdl-navigation__link" href=n.url>output(n.linktext)</a>
-//         }
-//       </nav>
-//     </div>
-//     <main class="mdl-layout__content">
-//       <div class="page-content">
-//         elements
-//       </div>
-//     </main>
-//   </div>
-// }
+template fixedHeader(title: String, user:User, navs: [url: String, linktext: String]){
+  var homejs := "document.location.href = '"+navigate(root())+"';"
+  var profilejs := "document.location.href = '"+navigate(profilePage(user))+"';"
+  <!-- Always shows a header, even in smaller screens. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+      <!-- User Name -->
+	    <span onclick=profilejs>
+	      output("Signed in as: "+user.name)
+	    </span>
+	    <!-- Add spacer -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Title -->
+        <span class="mdl-layout-title" onclick=homejs>
+          output(title)
+        </span>
+        <!-- Add spacer -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Navigation. We hide it in small screens. -->
+        <nav class="mdl-navigation mdl-layout--large-screen-only">
+          for(n in navs){
+            <a class="mdl-navigation__link" href=n.url>output(n.linktext)</a>
+          }
+        </nav>
+      </div>
+    </header>
+    <div class="mdl-layout__drawer">
+      <span class="mdl-layout-title" onclick=homejs>
+        output(title)
+      </span>
+      <span class="mdl-layout-title" style="line-height:30px; font-size:16px" onclick=profilejs>
+        output("Signed in as: "+user.name)
+      </span>
+      <nav class="mdl-navigation">
+        for(n in navs){
+          <a class="mdl-navigation__link" href=n.url>output(n.linktext)</a>
+        }
+       	<div class="navButton">
+        	logout() 
+      	</div>  
+      </nav>
+    </div>
+    <main class="mdl-layout__content">
+      <div class="page-content">
+        elements
+      </div>
+    </main>
+  </div>
+}
+
+template heading(title: String){
+  var homejs := "document.location.href = '"+navigate(root())+"';"
+  <!-- Always shows a header, even in smaller screens. -->
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+      <div class="mdl-layout__header-row">
+	    <!-- Add spacer -->
+        <div class="mdl-layout-spacer"></div>
+        <!-- Title -->
+        <span class="mdl-layout-title" onclick=homejs>
+          output(title)
+        </span>
+        <!-- Add spacer -->
+        <div class="mdl-layout-spacer"></div>
+      </div>
+    </header>
+    <main class="mdl-layout__content">
+      <div class="page-content">
+        elements
+      </div>
+    </main>
+  </div>
+}
 
 template card(title: String){
   <style>
@@ -100,7 +137,7 @@ template toggleVisibility( startText: String, toggleText: String){
   		}
   	}
   </script>
- <button id=id+"button" onclick="$( '#" + id + "' ).toggle(); toggleText($(this), '~startText','~toggleText'); ">
+ <button onclick="$( '#" + id + "' ).toggle(); toggleText($(this), '~startText','~toggleText'); "class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id=id+"button">
     output( startText )
   </button>
   <div id=id style="display:none;">
@@ -109,16 +146,17 @@ template toggleVisibility( startText: String, toggleText: String){
 }
 
 
-// section head
-// 
-// template mdlHead( primaryColor: String, accentColor: String ){
-//   head{
-//     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-//     <link rel = "stylesheet" href = "https://storage.googleapis.com/code.getmdl.io/1.0.0/material." + primaryColor + "-" + accentColor + ".min.css">
-//     <script src = "https://storage.googleapis.com/code.getmdl.io/1.0.0/material.min.js"></script>
-//     <link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
-//   }
-// }
+section head
+
+template mdlHead( primaryColor: String, accentColor: String ){
+  head{
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" href = "https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel = "stylesheet" href = "https://code.getmdl.io/1.3.0/material." + primaryColor + "-" + accentColor + ".min.css">
+    <script src = "https://code.getmdl.io/1.3.0/material.min.js" defer="true"></script> 
+    	//just adding defer was not supported but this should lead to defer be true
+  }
+}
 
 
 section grid
@@ -212,57 +250,42 @@ section input
 // }
 // 
 // 
-// section buttons
-// 
-// override attributes submit{
-//   class = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-// }
-// 
-// attributes floatingActionButtonColored{
-//   class = "mdl-button mdl-js-button mdl-button--fab mdl-button--colored"
-//   ignore submit attributes
-// }
-// 
-// attributes floatingActionButtonColoredRipple{
-//   class = "mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored"
-//   ignore submit attributes
-// }
-// 
-// attributes floatingActionButton{
-//   class = "mdl-button mdl-js-button mdl-button--fab"
-//   ignore submit attributes
-// }
-// 
-// attributes floatingActionButtonRipple{
-//   class = "mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect"
-//   ignore submit attributes
-// }
-// 
-// attributes floatingActionButtonDisabled{
-//   class = "mdl-button mdl-js-button mdl-button--fab"
-//   disabled = ""
-//   ignore submit attributes
-// }
-// 
-// attributes raisedButton{
-//   class = "mdl-button mdl-js-button mdl-button--raised"
-//   ignore submit attributes
-// }
-// 
-// attributes raisedButtonRipple{
-//   class = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-//   ignore submit attributes
-// }
-// 
-// attributes raisedButtonDisabled{
-//   class = "mdl-button mdl-js-button mdl-button--raised"
-//   disabled = ""
-//   ignore submit attributes
-// }
-// 
-// 
-// section icons
-// 
-// template iconAdd(){
-//   <i class = "material-icons"> "add" </i>
-// }
+section buttons
+
+override attributes submit{
+  class = "mdl-button mdl-js-button mdl-button--raised mdl-button--accent"
+}
+
+attributes floatingActionButtonColored{
+  class = "mdl-button mdl-js-button mdl-button--fab mdl-button--colored"
+  ignore submit attributes
+}
+
+attributes floatingActionButton{
+  class = "mdl-button mdl-js-button mdl-button--fab"
+  ignore submit attributes
+}
+
+attributes floatingActionButtonDisabled{
+  class = "mdl-button mdl-js-button mdl-button--fab"
+  disabled = ""
+  ignore submit attributes
+}
+
+attributes raisedButton{
+  class = "mdl-button mdl-js-button mdl-button--raised"
+  ignore submit attributes
+}
+
+attributes raisedButtonDisabled{
+  class = "mdl-button mdl-js-button mdl-button--raised"
+  disabled = ""
+  ignore submit attributes
+}
+
+
+section icons
+
+template iconAdd(){
+  <i class = "material-icons"> "add" </i>
+}

@@ -58,6 +58,7 @@ template showView(point: Point,writeAccess: Bool){
 }
 
 page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
+	mdlHead( "deep_orange", "deep_purple" )
 	h1{"ToDoList"}
 	h3{"Create point"}
 	var point := Point{}
@@ -81,6 +82,7 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 }
 
 page editPoint(point: Point,writeAccess: Bool, owner: Bool){
+	mdlHead( "deep_orange", "deep_purple" )
 	h1{"ToDoList"}
 	h3{text("Edit point"+point.name)}
 	submit action{
