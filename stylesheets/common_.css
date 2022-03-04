@@ -153,17 +153,3 @@ a.anchor-link:hover:before{
   position: absolute;
   left: -10px;
 }
-
-.delete{
-  color:#d32f2f;
-}
-
-.navButton {
-  padding-left: 40px;
-}
-
-@media screen and (max-width: 1024px){
-  .navButton {
-    padding-left: 16px;
-  }
-}

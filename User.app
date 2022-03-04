@@ -3,7 +3,7 @@ module User
 section User-model
 
 entity User{
-  name:: String (id, searchable)
+  name:: String (id, searchable, validate(name.length() > 0, "User needs name." ))
   password:: Secret ( validate(password.length() >= 10, "Minimum password length is 10." ) )
   email:: Email
   admin:: Bool
@@ -16,6 +16,7 @@ section User-view
 
 page createUser(){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	var newuser := User{}
 	var passCheck: Secret
 	heading("ToDo List"){
@@ -46,24 +47,24 @@ page createUser(){
 
 page adminPage(){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	mainLoggedIn(){
 		grid{
-			cell(12){h3{ "Create user" }}
+			cell(12){h3{ "Admin Page" }}
 			cell(12){submit action{return root();}{"Return To Home Page"}}
-			cell(12){}
 			}
 		
 		for (u:User){
-			div[style := "display: flex;"]{
-				form {
-				output("Id: "+u.id)
-				input("Name", u.name)
-				input("Email", u.email)
-				input("Admin", u.admin)
-			    output("Created: "+u.created)
-			    submit action{} { "Save" }
-				}
-			submit action{u.delete();}[style="background-color:#D11A2A"]{"Delete"}
+			div[class="adminContainer"]{
+				form[class="adminContainerForm"]{
+					output("Id: "+u.id)
+					label("Name: "){input( u.name)}
+					label("Email: "){input(u.email)}
+					label("Admin: "){input(u.admin)}
+					output("Created: "+u.created)
+				    submit action{} { "Save" }
+				    }    
+				submit action{u.delete();}[class="dangerButton"]{"Delete"}
 			}
 		}
 	}
@@ -77,6 +78,7 @@ page profilePage(u: User){
 	var mailCheck: Email
 	var oldPasswordEmail: Secret
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	mainLoggedIn(){
 		grid{
 			cell(12){h3{ "Profile" }}

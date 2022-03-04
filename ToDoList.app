@@ -63,6 +63,7 @@ template mainLoggedIn(){
 
 page root(){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	if(loggedIn()){
 		mainTemplate(){}	
 	}
@@ -70,7 +71,6 @@ page root(){
 		//authentication //default authentication not used
 		logintemplate
 	}
-	includeJS("")
 }
 
 template mainTemplate(){
@@ -92,8 +92,8 @@ template mainTemplate(){
 		h3{"Owner accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.ownerList){
-				div[style := "display: flex; flex-direction: row;"]{
-					navigate(pointListPage(todolist)){output(todolist.name)} 
+				div[class="listContainer"]{
+					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
 					submit action{
 						for(w in todolist.writer){
 							w.writeList.remove(todolist);
@@ -103,35 +103,35 @@ template mainTemplate(){
 			   			}
 			   			securityContext.principal.ownerList.remove(todolist);
 			   			todolist.delete();
-			   		}[style="background-color:#D11A2A"]{"Delete List"}
+			   		}[class="dangerButton"]{"Delete List"}
 			   	}
 			}
 		}
 		h3{"Writer accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.writeList){
-				div[style := "display: flex; flex-direction: row;"]{
-					navigate(pointListPage(todolist)){output(todolist.name)} 
+				div[class="listContainer"]{
+					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
 					submit action{
 						todolist.writer.remove(securityContext.principal);
 						securityContext.principal.writeList.remove(todolist);
 						todolist.save();
 						securityContext.principal.save();
-			   		}[style="background-color:#D11A2A"]{"Leave list"}
+			   		}[class="dangerButton"]{"Leave list"}
 			   	}
 			}
 		}
 		h3{"Reader accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
 			for(todolist in securityContext.principal.readList){
-				div[style := "display: flex; flex-direction: row;"]{
-					navigate(pointListPage(todolist)){output(todolist.name)}  
+				div[class="listContainer"]{
+					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)}  
 					submit action{
 						todolist.reader.remove(securityContext.principal);
 						securityContext.principal.readList.remove(todolist);
 						todolist.save();
 						securityContext.principal.save();
-			   		}[style="background-color:#D11A2A"]{"Leave list"}
+			   		}[class="dangerButton"]{"Leave list"}
 			   	}
 			}
 		}
@@ -169,7 +169,7 @@ template logintemplate() {
 	      cell(12){ input("Name", name)}
 	      cell(12){ input("Password", pass)}
 	      cell(12){ switch("Stay logged in", stayLoggedIn)}
-	      cell(12){ submit signinAction() { "Login" }}
+	      cell(12){ div{submit signinAction() { "Login" } }}
 	      cell(12){ submit action{return createUser();}{"Create user"}}
 	    }
   	}

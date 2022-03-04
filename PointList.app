@@ -46,6 +46,7 @@ page pointListPage(p:PointList){
 	var user : User
 	var share : ShareAccess
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	mainLoggedIn(){
 	   	h3{output(p.name)}
 	   	submit action{return root();}{"Back"}
@@ -92,13 +93,14 @@ page pointListPage(p:PointList){
 
 page accessListPage(p: PointList, owner: User){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 		mainLoggedIn(){
-		h3{ output("Access: "+p.name)}
+		h3{ output("Access to: "+p.name)}
 		submit action{return pointListPage(p);}{"Back"}
 		h5{ "Write access"}	
 		for (u in p.writer){
-			div[style := "display: flex;"]{
-				output( u.name )
+			div[class="userListContainer"]{
+				div[class="userListName"]{output( u.name )}
 			    submit action{
 			    	p.writer.remove(u);
 			    	p.reader.add(u);
@@ -108,13 +110,13 @@ page accessListPage(p: PointList, owner: User){
 			    submit action{
 			    	p.writer.remove(u);
 			    	u.writeList.remove(p);
-			    }[style="background-color:#D11A2A"]{"Remove access"}
+			    }[class="dangerButton"]{"Remove access"}
 			}
 		}
 		h5{ "Read access"}	
 		for (u in p.reader){
-			div[style := "display: flex;"]{
-				output( u.name )
+			div[class="userListContainer"]{
+				div[class="userListName"]{output( u.name )}
 			    submit action{
 			    	p.reader.remove(u);
 			    	p.writer.add(u);
@@ -123,7 +125,7 @@ page accessListPage(p: PointList, owner: User){
 			    submit action{
 			    	p.reader.remove(u);
 			    	u.readList.remove(p);
-			    }[style="background-color:#D11A2A"]{"Remove access"}
+			    }[class="dangerButton"]{"Remove access"}
 			}
 		}
 	}

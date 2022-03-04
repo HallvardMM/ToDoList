@@ -173,24 +173,6 @@ template cell( i: Int ){
 }
 
 
-// section tabs
-// 
-// template tabs( active: String, elems: [header: String, content: TemplateElements] ){
-//   <div class = "mdl-tabs mdl-js-tabs">
-//     <div class = "mdl-tabs__tab-bar">
-//       for( e in elems ){
-//         <a href = "#" + e.header + "-panel" class = "mdl-tabs__tab" + (if( e.header == active ) " is-active" else "")> output( e.header ) </a>
-//       }
-//     </div>
-//     for( e in elems ){
-//       <div id = e.header + "-panel" class = "mdl-tabs__panel" + (if( e.header == active ) " is-active" else "")>
-//         e.content
-//       </div>
-//     }
-//   </div>
-// }
-
-
 section input
 
 expandtemplate labelinput to Type {
@@ -282,10 +264,3 @@ attributes raisedButtonDisabled{
   disabled = ""
   ignore submit attributes
 }
-
-
-// section icons
-// 
-// template iconAdd(){
-//   <i class = "material-icons"> "add" </i>
-// }

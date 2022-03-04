@@ -26,7 +26,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 			submit action{
 				pg.parentList.pointGroups.remove(pg);
 	   			pg.delete();
-	   		}[style="background-color:#D11A2A"]{"Delete group"}
+	   		}[class="dangerButton"]{"Delete group"}
 		}
 	}
 	for(point in pg.points){
@@ -41,7 +41,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 				submit action{
 					pg.points.remove(point);
 					point.delete();
-				}[style="background-color:#D11A2A"]{"Delete Point"}
+				}[class="dangerButton"]{"Delete Point"}
 			}
 		}	
 	}

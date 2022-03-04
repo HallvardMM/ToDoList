@@ -40,7 +40,8 @@ template showView(point: Point,writeAccess: Bool){
 		output( "Assigned: " + point.assigned.name )
 		output( "Priority: " + point.priority.name)
 		if(writeAccess){
-			input("Done: ",point.done)[onclick := action{
+			output("Done: ")
+			input(point.done)[onclick := action{
 				point.toggleDone();
 				}]
 		} 
@@ -58,6 +59,7 @@ template showView(point: Point,writeAccess: Bool){
 
 page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	h1{"ToDoList"}
 	h3{"Create point"}
 	var point := Point{}
@@ -82,6 +84,7 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 
 page editPoint(point: Point,writeAccess: Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
 	h1{"ToDoList"}
 	h3{text("Edit point"+point.name)}
 	submit action{

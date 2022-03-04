@@ -1,0 +1,64 @@
+body{
+	font-family: "Roboto","Helvetica","Arial","sans-serif";
+}
+
+.dangerButton{
+  background-color: #D11A2A !important;
+}
+
+.navButton {
+  padding-left: 40px;
+}
+
+.userListName{
+  font-size: 24px;
+  margin: 10px 15px;
+}
+
+.userListContainer{
+  display: grid;
+  grid-template-columns: [first] 360px [line2] 120px [line2] 120px;
+  align-items: center;
+}
+
+.userListContainer > *{
+  margin: 5px 10px;
+}
+
+.listContainer{
+  display: grid;
+  grid-template-columns: [first] 360px [line2] 120px;
+  align-items: center;
+}
+
+.listLink{
+  font-size: 24px;
+  margin: 10px 15px;
+  text-decoration: none;
+}
+
+.adminContainer{
+  display: grid;
+  grid-template-columns: 1240px 90px;
+  align-items:center;
+}
+.adminContainer > *{
+  margin: 10px 5px; 
+}
+
+.adminContainerForm{
+  display: grid;
+  grid-template-columns: 340px 44px 220px 44px 220px 50px 30px 210px 20px;
+  justify-items: start;
+  align-items:center;
+}
+
+.adminContainerForm > *{
+	margin: 0px 10px;
+}
+
+@media screen and (max-width: 1024px){
+  .navButton {
+    padding-left: 16px;
+  }
+}
