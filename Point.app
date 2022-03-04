@@ -40,15 +40,14 @@ template showView(point: Point,writeAccess: Bool){
 		output( "Assigned: " + point.assigned.name )
 		output( "Priority: " + point.priority.name)
 		if(writeAccess){
-			output("Done: ")
-			input(point.done)[onclick := action{
+			input("Done: ",point.done)[onclick := action{
 				point.toggleDone();
 				}]
 		} 
 		else{
 			output( "Done: " + point.done)
 		}
-		toggleVisibility("v	","^"){
+		toggleVisibility("More","Less"){
 			output( "Description: " + point.description ) 
 			output( "URL: " + point.url ) 
 			output( "Due: " + point.dueTime ) 

@@ -77,7 +77,7 @@ template mainTemplate(){
 	var list := PointList{}
 	mainLoggedIn(){
 	form{
-		label("Create new list: "){ input(list.name)[not null] }
+		input("Create new list", list.name)[not null] 
 		for(todolist in securityContext.principal.ownerList){
 			validate(todolist.name != list.name, "Already have a list with same name." )
 		}
@@ -103,7 +103,7 @@ template mainTemplate(){
 			   			}
 			   			securityContext.principal.ownerList.remove(todolist);
 			   			todolist.delete();
-			   		}{"Delete List"}
+			   		}[style="background-color:#D11A2A"]{"Delete List"}
 			   	}
 			}
 		}
@@ -117,7 +117,7 @@ template mainTemplate(){
 						securityContext.principal.writeList.remove(todolist);
 						todolist.save();
 						securityContext.principal.save();
-			   		}{"Leave list"}
+			   		}[style="background-color:#D11A2A"]{"Leave list"}
 			   	}
 			}
 		}
@@ -131,7 +131,7 @@ template mainTemplate(){
 						securityContext.principal.readList.remove(todolist);
 						todolist.save();
 						securityContext.principal.save();
-			   		}{"Leave list"}
+			   		}[style="background-color:#D11A2A"]{"Leave list"}
 			   	}
 			}
 		}
@@ -166,9 +166,9 @@ template logintemplate() {
   	grid{
   		cell(12){h3{"Sign in"}}
   		form {
-	      cell(12){ label( "Name: " ){ input(name)}}
-	      cell(12){ label( "Password: " ){ input(pass)}}
-	      cell(12){ label( "Stay logged in: " ){input(stayLoggedIn)}}
+	      cell(12){ input("Name", name)}
+	      cell(12){ input("Password", pass)}
+	      cell(12){ switch("Stay logged in", stayLoggedIn)}
 	      cell(12){ submit signinAction() { "Login" }}
 	      cell(12){ submit action{return createUser();}{"Create user"}}
 	    }

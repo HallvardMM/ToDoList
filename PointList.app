@@ -25,7 +25,7 @@ template AddGroup(p: PointList){
 	var pointGroup := PointGroup{}
 	div[style := "display: flex;"]{
 	form {
-			label( "New Group: " ){ input( pointGroup.name )[not null] }
+			input( "New Group",pointGroup.name )[not null] 
 			for(group in p.pointGroups){
 			validate(group.name != pointGroup.name, "Already have a group with same name!" )
 			}
@@ -108,7 +108,7 @@ page accessListPage(p: PointList, owner: User){
 			    submit action{
 			    	p.writer.remove(u);
 			    	u.writeList.remove(p);
-			    }{"Remove access"}
+			    }[style="background-color:#D11A2A"]{"Remove access"}
 			}
 		}
 		h5{ "Read access"}	
@@ -123,7 +123,7 @@ page accessListPage(p: PointList, owner: User){
 			    submit action{
 			    	p.reader.remove(u);
 			    	u.readList.remove(p);
-			    }{"Remove access"}
+			    }[style="background-color:#D11A2A"]{"Remove access"}
 			}
 		}
 	}

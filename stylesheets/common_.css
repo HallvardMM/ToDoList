@@ -154,6 +154,10 @@ a.anchor-link:hover:before{
   left: -10px;
 }
 
+.delete{
+  color:#d32f2f;
+}
+
 .navButton {
   padding-left: 40px;
 }

@@ -22,10 +22,10 @@ page createUser(){
 		grid{
 			cell(12){h3{ "Create user" }}
 			form{
-				cell(12){label("Name: "){ input(newuser.name) }}
-				cell(12){label("Email: "){ input(newuser.email) }}
-				cell(12){label("Password: "){ input(newuser.password) }}
-				cell(12){label("Re-enter password: "){ input(passCheck)}}
+				cell(12){input("Name", newuser.name)}
+				cell(12){input("Email", newuser.email)}
+				cell(12){input("Password", newuser.password)}
+				cell(12){input("Re-enter password", passCheck)}
 				//captcha() //Tried to use captcha, but based on talk I skipped it since using GoogleApi was recommended
 				validate(newuser.password == passCheck, "The passwords are not the same." )
 				cell(12){submit action{
@@ -47,19 +47,23 @@ page createUser(){
 page adminPage(){
 	mdlHead( "deep_orange", "deep_purple" )
 	mainLoggedIn(){
-		h3{ "Create user" }
-		submit action{return root();}{"Return To Home Page"}	
+		grid{
+			cell(12){h3{ "Create user" }}
+			cell(12){submit action{return root();}{"Return To Home Page"}}
+			cell(12){}
+			}
+		
 		for (u:User){
 			div[style := "display: flex;"]{
 				form {
 				output("Id: "+u.id)
-				label( "Name: " ){ input( u.name ) }
-			    label( "Email: " ){ input( u.email ) }
-			    label( "Admin: " ){ input( u.admin ) }
+				input("Name", u.name)
+				input("Email", u.email)
+				input("Admin", u.admin)
 			    output("Created: "+u.created)
 			    submit action{} { "Save" }
 				}
-			submit action{u.delete();}{"Delete"}
+			submit action{u.delete();}[style="background-color:#D11A2A"]{"Delete"}
 			}
 		}
 	}
@@ -79,20 +83,20 @@ page profilePage(u: User){
 			cell(12){submit action{return root();}{"Return To Home Page"}}
 			cell(12){h5{"Mail change"}}
 			form {
-				cell(12){label( "Email: " ){ input( u.email ) }}
-				cell(12){label("Re-enter email: "){ input(mailCheck)}}
+				cell(12){input("Email", u.email)}
+				cell(12){input("Re-enter email", mailCheck)}
 				validate(u.email == mailCheck, "The mailaddresses are not the same." )
-				cell(12){label("Old Password: "){ input(oldPasswordEmail)}}
+				cell(12){input("Old Password", oldPasswordEmail)}
 				validate(u.password.check(oldPasswordEmail), "Old password wrong")
 				cell(12){submit action{} { "Save" }}
 				}
 			cell(12){h5{"Password change"}}
 			form {
-				cell(12){label("Password: "){ input(pass) }}
+				cell(12){input("Password",pass) }
 				validate(pass.length() >= 10, "Minimum password length is 10." )
-				cell(12){label("Re-enter password: "){ input(passCheck)}}
+				cell(12){input("Re-enter password", passCheck)}
 				validate( pass == passCheck, "The passwords are not the same." )
-				cell(12){label("Old Password: "){ input(oldPassword)}}
+				cell(12){input("Old Password", oldPassword)}
 				validate(u.password.check(oldPassword), "Old password wrong")
 				cell(12){submit action{u.password := pass.digest(); u.save();} { "Save" }}
 				}

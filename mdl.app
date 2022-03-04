@@ -176,7 +176,7 @@ template cell( i: Int ){
 // section tabs
 // 
 // template tabs( active: String, elems: [header: String, content: TemplateElements] ){
-//   <div class = "mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+//   <div class = "mdl-tabs mdl-js-tabs">
 //     <div class = "mdl-tabs__tab-bar">
 //       for( e in elems ){
 //         <a href = "#" + e.header + "-panel" class = "mdl-tabs__tab" + (if( e.header == active ) " is-active" else "")> output( e.header ) </a>
@@ -193,63 +193,63 @@ template cell( i: Int ){
 
 section input
 
-// expandtemplate labelinput to Type {
-//   template input( label: String, s: ref Type ){
-//     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-//       input( s )[ class="mdl-textfield__input", id=id, all attributes ]
-//       <label class="mdl-textfield__label" for=id> output( label ) </label>
-//     </div>
-//   }
-// }
-// 
-// expand 
-//   String
-//   Email
-//   Secret
-//   WikiText
-//   Text
-//   Int
-//   Float
-//   Long
-//   Date
-//   to labelinput
-//   
-// template input( label: String, b: ref Bool ){
-//   <label class = "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for = id>
-//     input( b )[ id = id, class = "mdl-checkbox__input" ]
-//     <span class = "mdl-checkbox__label"> output( label ) </span>
-//   </label>
-// }
-// 
-// template switch( label: String, b: ref Bool ){
-//   <label class = "mdl-switch mdl-js-switch mdl-js-ripple-effect" for = id>
-//     input( b )[ id = id, class = "mdl-switch__input" ]
-//     <span class = "mdl-switch__label"> output( label ) </span>
-//   </label>
-// }
-// 
-// template iconToggle( icon: String, b: ref Bool ){
-//   <label class = "mdl-icon-toggle mdl-js-icon-toggle mdl-js-ripple-effect" for = id>
-//     input( b )[ id = id, class = "mdl-icon-toggle__input" ]
-//     <span class = "mdl-icon-toggle__label material-icons"> output( icon ) </span>
-//   </label>
-// }
-// 
-// override attributes radio{
-//   class = "mdl-radio mdl-js-radio mdl-js-ripple-effect"
-// }
-// 
-// override template radio( ent: ref Entity ){
-//   radio( ent, ent.getAllowed() )[ class = "mdl-radio__button", all attributes ]{ elements }
-// }
-// 
-// override template outputLabel( e: Entity ){
-//  <span class = "mdl-radio__label">
-//    output( e.name )
-//  </span>
-// }
-// 
-// 
+expandtemplate labelinput to Type {
+  template input( label: String, s: ref Type ){
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+      input( s )[ class="mdl-textfield__input", id=id, all attributes ]
+      <label class="mdl-textfield__label" for=id> output( label ) </label>
+    </div>
+  }
+}
+
+expand 
+  String
+  Email
+  Secret
+  WikiText
+  Text
+  Int
+  Float
+  Long
+  Date
+  to labelinput
+  
+template input( label: String, b: ref Bool ){
+  <label class = "mdl-checkbox mdl-js-checkbox" for = id>
+	input( b )[ id = id, class = "mdl-checkbox__input" ]
+	<span class = "mdl-checkbox__label"> output( label ) </span>
+  </label>
+}
+
+template switch( label: String, b: ref Bool ){
+  <label class = "mdl-switch mdl-js-switch" for = id>
+    input( b )[ id = id, class = "mdl-switch__input" ]
+    <span class = "mdl-switch__label"> output( label ) </span>
+  </label>
+}
+
+template iconToggle( icon: String, b: ref Bool ){
+  <label class = "mdl-icon-toggle mdl-js-icon-toggle" for = id>
+    input( b )[ id = id, class = "mdl-icon-toggle__input" ]
+    <span class = "mdl-icon-toggle__label material-icons"> output( icon ) </span>
+  </label>
+}
+
+override attributes radio{
+  class = "mdl-radio mdl-js-radio"
+}
+
+override template radio( ent: ref Entity ){
+  radio( ent, ent.getAllowed() )[ class = "mdl-radio__button", all attributes ]{ elements }
+}
+
+override template outputLabel( e: Entity ){
+ <span class = "mdl-radio__label">
+   output( e.name )
+ </span>
+}
+
+
 section buttons
 
 override attributes submit{
@@ -284,8 +284,8 @@ attributes raisedButtonDisabled{
 }
 
 
-section icons
-
-template iconAdd(){
-  <i class = "material-icons"> "add" </i>
-}
+// section icons
+// 
+// template iconAdd(){
+//   <i class = "material-icons"> "add" </i>
+// }
