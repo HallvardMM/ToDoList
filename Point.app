@@ -35,24 +35,21 @@ section Point-view
 
 template showView(point: Point,writeAccess: Bool){
 	// Template for viewing a point
-	div[style := "display: flex;"]{
-		output( "Name: " + point.name )
-		output( "Assigned: " + point.assigned.name )
-		output( "Priority: " + point.priority.name)
+	div[class="pointContainer"]{
+		div{label("Name: "){output(point.name)}}
+		div{text("Assigned: ")output(point.assigned.name)}
+		div{text("Priority: ")output( point.priority.name)}	
 		if(writeAccess){
-			output("Done: ")
+			div{output("Done: ")
 			input(point.done)[onclick := action{
 				point.toggleDone();
-				}]
+				}]}
 		} 
-		else{
-			output( "Done: " + point.done)
-		}
-		toggleVisibility("More","Less"){
-			output( "Description: " + point.description ) 
-			output( "URL: " + point.url ) 
-			output( "Due: " + point.dueTime ) 
-			label( "Image: " ){ output(point.img)}
+		else{div{output( "Done: " + point.done)}}
+		div{text("Description: ")output(point.description)}
+		div[style:="overflow-wrap:break-word;"]{output( "URL: " + point.url )}
+		div{label("Due: "){output(point.dueTime )}} 
+		div[class="imageContainer"]{label( "Image: " ){ output(point.img)}
 		}
 	}
 }
@@ -60,50 +57,55 @@ template showView(point: Point,writeAccess: Bool){
 page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
-	h1{"ToDoList"}
-	h3{"Create point"}
 	var point := Point{}
-	submit action{return root();}{"Back"}
-	form {
-		div[style := "display: flex; flex-direction: column;"]{
-		label( "Name: " ){ input( point.name )}
-		label( "Assigned: " ){ input( point.assigned ) }
-		label( "Priority: "){ input(point.priority) }
-		label( "Description: " ){ input( point.description ) }
-		label( "URL: " ){ input( point.url ) }
-		label( "Due: " ){ input( point.dueTime ) }
-		label( "Image: "){ input(point.img) }
-		submit action{
-			point.parentGroup := pg;
-			point.save();
-			pg.points.add(point);
-			return pointListPage(pg.parentList);
-		} { "Save" }}
+	mainLoggedIn(){
+		h3{"Create point"}
+		submit action{return pointListPage(pg.parentList);}{"Back"}
+		form {
+			div[style := "display: flex; flex-direction: column;"]{
+			input("Name", point.name)[not null]
+			input("Assigned",point.assigned)
+			input("Priority",point.priority)
+			input("Description",point.description) 
+			input("URL",point.url) 
+			input("Due", point.dueTime)
+			div[style:="width:80px"]{
+					input("Image",point.img )
+			submit action{
+				point.parentGroup := pg;
+				point.save();
+				pg.points.add(point);
+				return pointListPage(pg.parentList);
+			} { "Save" }}
+			}
+		}
 	}
 }
 
 page editPoint(point: Point,writeAccess: Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
-	h1{"ToDoList"}
-	h3{text("Edit point"+point.name)}
-	submit action{
-				return pointListPage(point.parentGroup.parentList);
-			} { "Back"  }
-	form {
-		div[style := "display: flex; flex-direction: column;"]{	
-				label( "Name: " ){ input( point.name )[not null] }
-				label( "Assigned: " ){ input( point.assigned ) }
-				label( "Priority: "){ input(point.priority) }
-				label( "Done: "){ input(point.done) 
-				label( "Description: " ){ input( point.description ) }
-				label( "URL: " ){ input( point.url ) }
-				label( "Due: " ){ input( point.dueTime ) }
-				label( "Image: "){ input(point.img) }
+	mainLoggedIn(){
+		h3{text("Edit point"+point.name)}
+		submit action{
+					return pointListPage(point.parentGroup.parentList);
+				} { "Back"  }
+		form {
+			div[style := "display: flex; flex-direction: column;"]{
+				input("Name", point.name)[not null]
+				input("Assigned",point.assigned)
+				input("Priority",point.priority)
+				input("Done", point.done)
+				input("Description",point.description) 
+				input("URL",point.url) 
+				input("Due", point.dueTime)
+				div[style:="width:80px"]{
+					input("Image",point.img )
 				submit action{
 					point.save();
 					return pointListPage(point.parentGroup.parentList);
 				} { "Save" }
+				}
 			}
 		}
 	}

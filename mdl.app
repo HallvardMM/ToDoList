@@ -175,6 +175,15 @@ template cell( i: Int ){
 
 section input
 
+expandtemplate labelinputajax to Type{
+	template inputajax( label: String, s: ref Type ){
+    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+      input( s )[ class="mdl-textfield__input", id=id, all attributes ]
+      <label class="mdl-textfield__label" for=id> output( label ) </label>
+    </div>
+  }
+}
+
 expandtemplate labelinput to Type {
   template input( label: String, s: ref Type ){
     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -194,6 +203,10 @@ expand
   Float
   Long
   Date
+  DateTime
+  URL
+  Priority
+  User
   to labelinput
   
 template input( label: String, b: ref Bool ){
@@ -201,6 +214,13 @@ template input( label: String, b: ref Bool ){
 	input( b )[ id = id, class = "mdl-checkbox__input" ]
 	<span class = "mdl-checkbox__label"> output( label ) </span>
   </label>
+}
+
+template input( label: String, i: ref Image ){
+	<label for=id class="custom-file-upload">
+	    <i class="fa fa-cloud-upload"></i> output(label)
+	    input( i )[id=id, style:="display: none"]
+	</label>
 }
 
 template switch( label: String, b: ref Bool ){

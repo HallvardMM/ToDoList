@@ -15,7 +15,7 @@ section PointGroup-view
 section PointGroup-controller
 
 template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
-	div[style := "display: flex;"]{
+	div[class="groupContainer"]{
 		h5{output(pg.name)}
 		if(writeAccess){
 			submit action{
@@ -30,7 +30,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 		}
 	}
 	for(point in pg.points){
-		div[style := "display: flex;"]{
+		div[class="pointWithButtons"]{
 			showView(point,writeAccess)
 			if(writeAccess){
 			submit action{

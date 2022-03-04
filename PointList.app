@@ -57,9 +57,9 @@ page pointListPage(p:PointList){
 	   		toggleVisibility("Share access","Hide share"){
 				form{
 					// TODO: User should not see themselves
-					div[style := "display: flex;"]{
-						label("User: "){ inputajax(user){ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
-						label("Rights: "){ inputajax(share){ validate(share.name.length()>0,"Choose access!")}}
+					div[class="shareAccesConatainer"]{
+						label("User: "){ inputajax(user)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+						label("Rights: "){ inputajax(share)[not null]{ validate(share.name.length()>0,"Choose access!")}}
 						submit action{
 							if(share.name == "Write"){
 								if(user in p.reader){
