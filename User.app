@@ -3,9 +3,9 @@ module User
 section User-model
 
 entity User{
-  name:: String (id, searchable, validate(name.length() > 0, "User needs name." ))
+  name:: String (id, validate(name.length() > 0, "User needs name." ))
   password:: Secret ( validate(password.length() >= 10, "Minimum password length is 10." ) )
-  email:: Email
+  email:: Email (not null)
   admin:: Bool
   ownerList <> {PointList} (inverse=PointList.owner)
   writeList -> {PointList} (inverse=PointList.writer)
@@ -58,7 +58,7 @@ page adminPage(){
 			div[class="adminContainer"]{
 				form[class="adminContainerForm"]{
 					output("Id: "+u.id)
-					label("Name: "){input( u.name)}
+					label("Name: "){input( u.name)[not null]}
 					label("Email: "){input(u.email)}
 					label("Admin: "){input(u.admin)}
 					output("Created: "+u.created)

@@ -15,24 +15,43 @@ access control rules
 
 rule page root(){ true }
 rule page createUser(){ !loggedIn() }
-rule page profilePage(u:User){u ==securityContext.principal}
-rule page adminPage(){principal.admin}
+rule page profilePage(u:User){u == securityContext.principal}
+rule page adminPage(){securityContext.principal.admin}
 rule page pointListPage(p:PointList){
-	(p.owner==securityContext.principal || securityContext.principal in p.writer || securityContext.principal in p.reader)
+	(p.owner==securityContext.principal 
+	|| securityContext.principal in p.writer 
+	|| securityContext.principal in p.reader)
 }
 rule page addPoint(pg: PointGroup, writeAccess: Bool, owner: Bool){
-	(principal == pg.parentList.owner || principal in pg.parentList.writer) && writeAccess==true
+	(securityContext.principal == pg.parentList.owner 
+	|| securityContext.principal in pg.parentList.writer) 
+	&& writeAccess==true //writeAccess==true might be superfluous
 }
 rule page editPoint(point: Point,writeAccess: Bool,owner:Bool){
-	(principal == point.parentGroup.parentList.owner || principal in point.parentGroup.parentList.writer) && writeAccess==true
+	(securityContext.principal == point.parentGroup.parentList.owner 
+	|| securityContext.principal in point.parentGroup.parentList.writer)
+	 && writeAccess==true //writeAccess==true might be superfluous
 }
 rule page accessListPage(p: PointList, owner: User){
-	owner == principal
+	owner == securityContext.principal
 }
 
 //rule page *(*) {true} //For development purposes!
 
 section root 
+
+page root(){
+	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
+	if(loggedIn()){
+		mainTemplate(){}	
+	}
+	else{
+		//authentication //default authentication not used
+		logintemplate
+	}
+}
+
 
 template mainLoggedIn(){
 	if(securityContext.principal.admin){
@@ -59,18 +78,6 @@ template mainLoggedIn(){
 		  }
 	}
  
-}
-
-page root(){
-	mdlHead( "deep_orange", "deep_purple" )
-	includeCSS("ToDoList.css")
-	if(loggedIn()){
-		mainTemplate(){}	
-	}
-	else{
-		//authentication //default authentication not used
-		logintemplate
-	}
 }
 
 template mainTemplate(){

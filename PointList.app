@@ -58,7 +58,7 @@ page pointListPage(p:PointList){
 				form{
 					// TODO: User should not see themselves
 					div[class="shareAccesConatainer"]{
-						label("User: "){ inputajax(user order by user.name asc)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+						label("User: "){ inputajax(user)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
 						label("Rights: "){ inputajax(share)[not null]{ validate(share.name.length()>0,"Choose access!")}}
 						submit action{
 							if(share.name == "Write"){
