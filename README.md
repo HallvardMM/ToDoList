@@ -51,6 +51,9 @@ To clean auto created files: `webdsl clean`
 		div[style:="color:~color;"]
 		elements
 	}
-- Did a more through access control then planned since Webdsl had good support.
+- Did a more thorough access control then planned since Webdsl had good support.
+- Added tests which is good code practice:
+	- Did it mostly to test out webdsl's test solution
+	- Added some test to check the functions
 
 
