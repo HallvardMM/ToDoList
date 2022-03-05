@@ -6,13 +6,11 @@ module mdl
 section application-specific layout
 
 template maingridcard(cardtitle: String){
-  
-    grid{
-      card(cardtitle){
-        elements
-      }
-     }
-  
+	grid{
+		card(cardtitle){
+			elements
+		}
+	}
 }
 
 template fixedHeader(title: String, user:User, navs: [url: String, linktext: String]){
@@ -137,7 +135,10 @@ template toggleVisibility( startText: String, toggleText: String){
   		}
   	}
   </script>
- <button onclick="$( '#" + id + "' ).toggle(); toggleText($(this), '~startText','~toggleText'); "class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" id=id+"button">
+ <button 
+ 	onclick="$( '#" + id + "' ).toggle(); toggleText($(this), '~startText','~toggleText');"
+ 	class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" 
+ 	id=id+"button">
     output( startText )
   </button>
   <div id=id style="display:none;">
@@ -175,15 +176,6 @@ template cell( i: Int ){
 
 section input
 
-expandtemplate labelinputajax to Type{
-	template inputajax( label: String, s: ref Type ){
-    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-      input( s )[ class="mdl-textfield__input", id=id, all attributes ]
-      <label class="mdl-textfield__label" for=id> output( label ) </label>
-    </div>
-  }
-}
-
 expandtemplate labelinput to Type {
   template input( label: String, s: ref Type ){
     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -217,6 +209,7 @@ template input( label: String, b: ref Bool ){
 }
 
 template input( label: String, i: ref Image ){
+	//Image files uses this to "almost" look like button
 	<label for=id class="custom-file-upload">
 	    <i class="fa fa-cloud-upload"></i> output(label)
 	    input( i )[id=id, style:="display: none"]
@@ -229,28 +222,6 @@ template switch( label: String, b: ref Bool ){
     <span class = "mdl-switch__label"> output( label ) </span>
   </label>
 }
-
-template iconToggle( icon: String, b: ref Bool ){
-  <label class = "mdl-icon-toggle mdl-js-icon-toggle" for = id>
-    input( b )[ id = id, class = "mdl-icon-toggle__input" ]
-    <span class = "mdl-icon-toggle__label material-icons"> output( icon ) </span>
-  </label>
-}
-
-override attributes radio{
-  class = "mdl-radio mdl-js-radio"
-}
-
-override template radio( ent: ref Entity ){
-  radio( ent, ent.getAllowed() )[ class = "mdl-radio__button", all attributes ]{ elements }
-}
-
-override template outputLabel( e: Entity ){
- <span class = "mdl-radio__label">
-   output( e.name )
- </span>
-}
-
 
 section buttons
 

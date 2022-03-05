@@ -1,3 +1,9 @@
+// List of groups and points
+// Can be shared with users
+// Owner can delete, write, read
+// Writer can write, read
+// Reader can read
+
 module PointList
 
 section PointList-model
@@ -41,46 +47,22 @@ template AddGroup(p: PointList){
 section PointList-controller
 
 page pointListPage(p:PointList){
+	// Page for a specific list
+	// Share, add or delete
 	var owner := (securityContext.principal == p.owner)
 	var writer := (securityContext.principal in p.writer)
-	var user : User
-	var share : ShareAccess
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
-	mainLoggedIn(){
+	headerLoggedIn(){
 	   	h3{output(p.name)}
 	   	submit action{return root();}{"Back"}
 	   	if(owner){
 			submit action{
 				return accessListPage(p, p.owner);
 	   		}{ "Change access" }
-	   		toggleVisibility("Share access","Hide share"){
-				form{
-					// TODO: User should not see themselves
-					div[class="shareAccesConatainer"]{
-						label("User: "){ inputajax(user)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
-						label("Rights: "){ inputajax(share)[not null]{ validate(share.name.length()>0,"Choose access!")}}
-						submit action{
-							if(share.name == "Write"){
-								if(user in p.reader){
-									user.readList.remove(p);
-									p.reader.remove(user);
-								}
-								p.writer.add(user);
-								user.writeList.add(p);
-							}
-							else{
-								if(user in p.writer){
-									user.writeList.remove(p);
-									p.writer.remove(user);
-								}
-								p.reader.add(user);
-								user.readList.add(p);
-							}
-						}{"Give access"}
-					}
-				} 
-			}
+		}
+		if(owner){
+			ajaxShare(p)
 		}
 	   	if(owner || writer){
 	   		AddGroup(p)
@@ -91,10 +73,54 @@ page pointListPage(p:PointList){
 	}
 } 
 
+
+template ajaxShare(p:PointList){
+	// Sharing access uses access to make it easier for
+	// the user to share a list with read/write access
+	// User can choose whom to share with by selecting
+	// from all users. Could have added "friends" functionality
+	// to only be able to chose from friends
+	// Was not able to style ajaxinout like mdl
+	var user : User
+	var share : ShareAccess
+	toggleVisibility("Share access","Hide share"){
+		// Toggle showing using Ajax
+		form{
+			div[class="shareAccesConatainer flexColumn"]{
+				label("User: "){ inputajax(user)[not null]
+				// Should remove the option to choose oneself, but
+				// this gives a reason to do ajax validation :)
+				{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+				label("Rights: "){ inputajax(share)[not null]
+				{ validate(share.name.length()>0,"Choose access!")}}
+				submit action{
+					if(share.name == "Write"){
+						if(user in p.reader){
+							user.readList.remove(p);
+							p.reader.remove(user);
+						}
+						p.writer.add(user);
+						user.writeList.add(p);
+					}
+					else{
+						if(user in p.writer){
+							user.writeList.remove(p);
+							p.writer.remove(user);
+						}
+						p.reader.add(user);
+						user.readList.add(p);
+					}
+				}{"Give access"}
+			}
+		} 
+	}
+}
+
 page accessListPage(p: PointList, owner: User){
+	// Page to change access rights or remove them
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
-		mainLoggedIn(){
+		headerLoggedIn(){
 		h3{ output("Access to: "+p.name)}
 		submit action{return pointListPage(p);}{"Back"}
 		h5{ "Write access"}	

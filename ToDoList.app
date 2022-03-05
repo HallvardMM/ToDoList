@@ -36,6 +36,12 @@ rule page accessListPage(p: PointList, owner: User){
 	owner == securityContext.principal
 }
 
+rule page imagePage(point:Point){
+	(securityContext.principal == point.parentGroup.parentList.owner 
+	|| securityContext.principal in point.parentGroup.parentList.writer
+	|| securityContext.principal in point.parentGroup.parentList.reader)
+}
+
 //rule page *(*) {true} //For development purposes!
 
 section root 
@@ -44,7 +50,7 @@ page root(){
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
 	if(loggedIn()){
-		mainTemplate(){}	
+		startSite(){}	
 	}
 	else{
 		//authentication //default authentication not used
@@ -52,101 +58,111 @@ page root(){
 	}
 }
 
+section root-templates
 
-template mainLoggedIn(){
-	if(securityContext.principal.admin){
-		 fixedHeader(
-		    "ToDo List",
-		    securityContext.principal,
-		    [
-		      ( navigate(profilePage(securityContext.principal)), "Profile" ),
-		      ( navigate(adminPage()), "Admin" )
-		      
-		    ]
-		  ){
-		    elements
-		  }
-	}else{
-		fixedHeader(
-		    "ToDo List",
-		    securityContext.principal,
-		    [ 
-		      ( navigate(profilePage(securityContext.principal)), "Profile" )
-		    ]
-		  ){
-		    elements
-		  }
+template startSite(){
+	// Main template for root when logged in
+	var u:=securityContext.principal
+	headerLoggedIn(){
+		createList(u)
+		listContainer("Owner accsess lists",u.ownerList,u,true,false)
+		listContainer("Writer accsess lists",u.writeList,u,false,true)
+		listContainer("Reader accsess lists",u.readList,u,false,false)
 	}
- 
 }
 
-template mainTemplate(){
+template headerLoggedIn(){
+	// Tried to refactor with function but
+	// but could not return type [url : String, linktext : String]
+	// which fixedHeader needs
+	var u:= securityContext.principal
+	if(u.admin){
+		fixedHeader(
+	    "ToDo List",u,
+	    [
+			(navigate(profilePage(u)), "Profile") ,
+			(navigate(adminPage()), "Admin")
+		 ]
+	  )
+	  {elements}
+	}else{
+		fixedHeader(
+	    "ToDo List",u,
+	    [ (navigate(profilePage(u)), "Profile")]
+	  )
+	  {elements}	
+	}
+}
+
+template listContainer(header:String,lists:{PointList},user:User,owner:Bool,writer:Bool){
+	//Container for different todo lists
+	div[class="startPagePadding flexColumn"]{
+		h3{output(header)}
+		for(todolist in lists order by todolist.name asc){
+			div[class="listContainer"]{
+				navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
+				if(owner){
+					submit action{
+						deleteList(todolist,user);
+			   		}[class="dangerButton"]{"Delete List"}
+				}
+				else{
+					submit action{
+						leaveList(todolist,user,writer);
+			   		}[class="dangerButton"]{"Leave list"}
+				}
+			}
+		}
+	}
+}
+
+template createList(u:User){
+	// Create a list that is added to owner access
 	var list := PointList{}
-	mainLoggedIn(){
-	form{
+	div[class="startPagePadding"]{
+		form{
 		input("Create new list", list.name)[not null] 
-		for(todolist in securityContext.principal.ownerList){
+		for(todolist in u.ownerList){
 			validate(todolist.name != list.name, "Already have a list with same name." )
 		}
 		submit action{
-			list.owner := securityContext.principal;
+			list.owner := u;
 			list.save();
-			securityContext.principal.ownerList.add(list);
-			securityContext.principal.save();
+			u.ownerList.add(list);
 		}
 		{"Create"}
-	}	
-		h3{"Owner accsess lists"}
-		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.ownerList order by todolist.name asc){
-				div[class="listContainer"]{
-					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
-					submit action{
-						for(w in todolist.writer){
-							w.writeList.remove(todolist);
-							}
-			   			for(r in todolist.reader){
-			   				r.readList.remove(todolist);
-			   			}
-			   			securityContext.principal.ownerList.remove(todolist);
-			   			todolist.delete();
-			   		}[class="dangerButton"]{"Delete List"}
-			   	}
-			}
-		}
-		h3{"Writer accsess lists"}
-		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.writeList order by todolist.name asc){
-				div[class="listContainer"]{
-					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
-					submit action{
-						todolist.writer.remove(securityContext.principal);
-						securityContext.principal.writeList.remove(todolist);
-						todolist.save();
-						securityContext.principal.save();
-			   		}[class="dangerButton"]{"Leave list"}
-			   	}
-			}
-		}
-		h3{"Reader accsess lists"}
-		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.readList order by todolist.name asc){
-				div[class="listContainer"]{
-					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)}  
-					submit action{
-						todolist.reader.remove(securityContext.principal);
-						securityContext.principal.readList.remove(todolist);
-						todolist.save();
-						securityContext.principal.save();
-			   		}[class="dangerButton"]{"Leave list"}
-			   	}
-			}
 		}
 	}
 }
 
+section root-controlls
 
-section pages
+function deleteList(list: PointList, u:User){
+	// Delete list if owner access 
+	for(w in list.writer){
+		w.writeList.remove(list);
+		}
+	for(r in list.reader){
+		r.readList.remove(list);
+	}
+	u.ownerList.remove(list);
+	list.delete(); 
+}
+
+function leaveList(list: PointList, u:User, writer:Bool){
+	// Leave a list if read/write access
+	if(writer){
+		list.writer.remove(u);
+		u.writeList.remove(list);
+	}else{
+		list.reader.remove(u);
+		u.readList.remove(list);
+	}	
+}
+
+
+section accessDeniedpages
+// Based on this repo: https://github.com/webdsl/cs4105-demo @Author: dgroenewegen 
 
 override page accessDenied(){
   mdlHead( "deep_orange", "deep_purple" )
@@ -158,26 +174,30 @@ override page accessDenied(){
 
 
 section override default authentication styles
+// Based on this repo: https://github.com/webdsl/cs4105-demo @Author: dgroenewegen 
 
 override template logout() {
+	// Removes standard logged in text
    	form{ submit action{ securityContext.principal := null;
    		return root(); }{ "Logout" } }
-   	
  }
 
 template logintemplate() {
+  // Where the user can sign Used instaed of authenticate
   var name: String
   var pass: Secret
   var stayLoggedIn := false
   heading("ToDo List"){
-  	grid{
-  		cell(12){h3{"Sign in"}}
+  	div[class="startPagePadding"]{
+  		h3{"Sign in"}
   		form {
-	      cell(12){ input("Name", name)}
-	      cell(12){ input("Password", pass)}
-	      cell(12){ switch("Stay logged in", stayLoggedIn)}
-	      cell(12){ div{submit signinAction() { "Login" } }}
-	      cell(12){ submit action{return createUser();}{"Create user"}}
+  			grid{
+  			  cell(12){ input("Name", name)}
+		      cell(12){ input("Password", pass)}
+		      cell(12){ switch("Stay logged in", stayLoggedIn)}
+		      cell(1){ div{submit signinAction() { "Login" } }}
+		      cell(2){ submit action{return createUser();}{"Create user"}}
+  			}
 	    }
   	}
   }

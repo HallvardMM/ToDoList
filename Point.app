@@ -1,4 +1,7 @@
 //A point to refer to a task/work in a todolist
+// Owner can delete, write, read
+// Writer can write, read
+// Reader can read
 
 module Point
 
@@ -41,6 +44,7 @@ template showView(point: Point,writeAccess: Bool){
 		div{text("Priority: ")output( point.priority.name)}	
 		if(writeAccess){
 			div{output("Done: ")
+			//Ajax for smoother checking
 			input(point.done)[onclick := action{
 				point.toggleDone();
 				}]}
@@ -49,8 +53,35 @@ template showView(point: Point,writeAccess: Bool){
 		div{text("Description: ")output(point.description)}
 		div[style:="overflow-wrap:break-word;"]{output( "URL: " + point.url )}
 		div{label("Due: "){output(point.dueTime )}} 
-		div[class="imageContainer"]{label( "Image: " ){ output(point.img)}
+		// Hard to do a null check here However it does not make an issue
+		label( "Image: " ){ navigate(imagePage(point)){ output(point.img.toString()) } }
+	}
+}
+
+page imagePage(point:Point){
+	mdlHead( "deep_orange", "deep_purple" )
+	includeCSS("ToDoList.css")
+	headerLoggedIn(){
+		div[class="flexColumn"]{
+			h3{text("Image for point"+point.name)}
+			submit action{return pointListPage(point.parentGroup.parentList);}[style:="width:90px"]{"Back"}
+			div[class="imageWrapper"]{
+				output(point.img)
+			}
 		}
+	}
+}
+
+template inputPoint(point:Point){
+	div[class = "flexColumn"]{
+			input("Name", point.name)[not null]
+			input("Assigned",point.assigned)
+			input("Priority",point.priority)
+			input("Description",point.description) 
+			input("URL",point.url) 
+			input("Due", point.dueTime)
+			input("Image", point.img)
+			elements
 	}
 }
 
@@ -58,25 +89,17 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
 	var point := Point{}
-	mainLoggedIn(){
+	headerLoggedIn(){
 		h3{"Create point"}
 		submit action{return pointListPage(pg.parentList);}{"Back"}
 		form {
-			div[style := "display: flex; flex-direction: column;"]{
-			input("Name", point.name)[not null]
-			input("Assigned",point.assigned)
-			input("Priority",point.priority)
-			input("Description",point.description) 
-			input("URL",point.url) 
-			input("Due", point.dueTime)
-			div[style:="width:80px"]{
-					input("Image",point.img )
-			submit action{
-				point.parentGroup := pg;
-				point.save();
-				pg.points.add(point);
-				return pointListPage(pg.parentList);
-			} { "Save" }}
+				inputPoint(point){
+				submit action{
+					point.parentGroup := pg;
+					point.save();
+					pg.points.add(point);
+					return pointListPage(pg.parentList);
+				}[style:="width:300px"] { "Save" }
 			}
 		}
 	}
@@ -85,27 +108,17 @@ page addPoint(pg: PointGroup, writeAccess:Bool, owner: Bool){
 page editPoint(point: Point,writeAccess: Bool, owner: Bool){
 	mdlHead( "deep_orange", "deep_purple" )
 	includeCSS("ToDoList.css")
-	mainLoggedIn(){
+	headerLoggedIn(){
 		h3{text("Edit point"+point.name)}
 		submit action{
-					return pointListPage(point.parentGroup.parentList);
-				} { "Back"  }
+			return pointListPage(point.parentGroup.parentList);
+			} { "Back"  }
 		form {
-			div[style := "display: flex; flex-direction: column;"]{
-				input("Name", point.name)[not null]
-				input("Assigned",point.assigned)
-				input("Priority",point.priority)
-				input("Done", point.done)
-				input("Description",point.description) 
-				input("URL",point.url) 
-				input("Due", point.dueTime)
-				div[style:="width:80px"]{
-					input("Image",point.img )
+			inputPoint(point){
 				submit action{
 					point.save();
 					return pointListPage(point.parentGroup.parentList);
-				} { "Save" }
-				}
+				}[style:="width:300px"] { "Save" }
 			}
 		}
 	}

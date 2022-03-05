@@ -1,3 +1,9 @@
+//A group of points could be "sports" 
+// and then have sports related todo points in it
+// Owner can delete, write, read
+// Writer can write, read
+// Reader can read
+
 module PointGroup
 
 imports Point
@@ -11,8 +17,6 @@ entity PointGroup{
 }
 
 section PointGroup-view
-
-section PointGroup-controller
 
 template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 	div[class="groupContainer"]{
