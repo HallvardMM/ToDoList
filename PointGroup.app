@@ -29,7 +29,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 	   		}[class="dangerButton"]{"Delete group"}
 		}
 	}
-	for(point in pg.points){
+	for(point in pg.points order by point.name asc){
 		div[class="pointWithButtons"]{
 			showView(point,writeAccess)
 			if(writeAccess){

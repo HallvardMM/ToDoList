@@ -91,7 +91,7 @@ template mainTemplate(){
 	}	
 		h3{"Owner accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.ownerList){
+			for(todolist in securityContext.principal.ownerList order by todolist.name asc){
 				div[class="listContainer"]{
 					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
 					submit action{
@@ -109,7 +109,7 @@ template mainTemplate(){
 		}
 		h3{"Writer accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.writeList){
+			for(todolist in securityContext.principal.writeList order by todolist.name asc){
 				div[class="listContainer"]{
 					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)} 
 					submit action{
@@ -123,7 +123,7 @@ template mainTemplate(){
 		}
 		h3{"Reader accsess lists"}
 		div[style := "display: flex; flex-direction: column;"]{
-			for(todolist in securityContext.principal.readList){
+			for(todolist in securityContext.principal.readList order by todolist.name asc){
 				div[class="listContainer"]{
 					navigate(pointListPage(todolist))[class="listLink"]{output(todolist.name)}  
 					submit action{

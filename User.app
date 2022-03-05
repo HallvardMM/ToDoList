@@ -54,7 +54,7 @@ page adminPage(){
 			cell(12){submit action{return root();}{"Return To Home Page"}}
 			}
 		
-		for (u:User){
+		for (u:User order by u.name asc){
 			div[class="adminContainer"]{
 				form[class="adminContainerForm"]{
 					output("Id: "+u.id)

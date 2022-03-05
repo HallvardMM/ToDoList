@@ -26,7 +26,7 @@ template AddGroup(p: PointList){
 	div[style := "display: flex;"]{
 	form {
 			input( "New Group",pointGroup.name )[not null] 
-			for(group in p.pointGroups){
+			for(group in p.pointGroups order by group.name asc){
 			validate(group.name != pointGroup.name, "Already have a group with same name!" )
 			}
 			submit action{
@@ -58,7 +58,7 @@ page pointListPage(p:PointList){
 				form{
 					// TODO: User should not see themselves
 					div[class="shareAccesConatainer"]{
-						label("User: "){ inputajax(user)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
+						label("User: "){ inputajax(user order by user.name asc)[not null]{ validate(user!=securityContext.principal,"Cannot share with yourself!")}}
 						label("Rights: "){ inputajax(share)[not null]{ validate(share.name.length()>0,"Choose access!")}}
 						submit action{
 							if(share.name == "Write"){
@@ -85,7 +85,7 @@ page pointListPage(p:PointList){
 	   	if(owner || writer){
 	   		AddGroup(p)
 	   	}
-		for(group in p.pointGroups){
+		for(group in p.pointGroups order by group.name asc){
 			PointGroupTemplate(group, (owner || writer), owner)
 		}
 	}
@@ -98,7 +98,7 @@ page accessListPage(p: PointList, owner: User){
 		h3{ output("Access to: "+p.name)}
 		submit action{return pointListPage(p);}{"Back"}
 		h5{ "Write access"}	
-		for (u in p.writer){
+		for (u in p.writer order by u.name asc){
 			div[class="userListContainer"]{
 				div[class="userListName"]{output( u.name )}
 			    submit action{
@@ -114,7 +114,7 @@ page accessListPage(p: PointList, owner: User){
 			}
 		}
 		h5{ "Read access"}	
-		for (u in p.reader){
+		for (u in p.reader order by u.name asc){
 			div[class="userListContainer"]{
 				div[class="userListName"]{output( u.name )}
 			    submit action{
