@@ -115,3 +115,37 @@ page profilePage(u: User){
 		}
 	}		
 }
+
+section User-controller
+
+
+//Used for the adminPage of the application
+service allUsers(){
+  var a := JSONArray();
+  for( u: User order by u.name asc){
+    var o := JSONObject();
+    o.put( "id", u.id );
+    o.put( "name", u.name );
+    o.put( "email", u.email );
+    o.put( "admin", u.admin );
+    o.put( "created", u.created.toString() );
+    a.put( o );
+  }
+  return a;
+}
+
+// GET parameters can be provided in the URL with:
+// servicename/arg1/arg2 or servicename?param1=arg1&param2=arg2
+// test with: curl http://localhost:8080/wpl-demo/getUser/[insert one of the ids]
+
+service getUser( user: User ){
+  var o := JSONObject();
+  o.put( "id", user.id );
+  o.put( "name", user.name );
+  o.put( "email", user.email );
+  o.put("admin",user.admin);
+  o.put("ownerList",user.ownerList.toString());
+  o.put("writeList",user.writeList.toString());
+  o.put("readList",user.readList.toString());
+  return o;
+}

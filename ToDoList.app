@@ -42,6 +42,11 @@ rule page imagePage(point:Point){
 	|| securityContext.principal in point.parentGroup.parentList.reader)
 }
 
+access control rules
+  // use page rules for services
+  rule page allUsers(){ true }
+  rule page getUser( user: User ){ true }
+
 //rule page *(*) {true} //For development purposes!
 
 section root 

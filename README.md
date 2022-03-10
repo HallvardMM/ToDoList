@@ -56,4 +56,20 @@ To clean auto created files: `webdsl clean`
 	- Did it mostly to test out webdsl's test solution
 	- Added some test to check the functions
 
+## The project
+An brief explenation of the most relevant files for the project
+
+.
+??? README.md 			// This file containing info about the project
+??? Point.app			// An entity for a single point in a list to represent a task/work
+??? PointGroup.app		// An entity for collecting points
+??? PointList.app		// An entity for a ToDo list
+??? ToDoList.app		// The main file containt the main page and root
+??? ToDoListTest.app	// A file containing the test for the application
+??? User.app			// A file for the user entity and logic
+??? application.ini		// File for configuring the project 
+??? stylesheets			
+    ??? ToDoList.css	// The css added for this project
+    ??? common_.css		// The default css for every webdsl project
+
 
