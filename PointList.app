@@ -44,8 +44,6 @@ template AddGroup(p: PointList){
 	}
 }
 
-section PointList-controller
-
 page pointListPage(p:PointList){
 	// Page for a specific list
 	// Share, add or delete
@@ -155,4 +153,32 @@ page accessListPage(p: PointList, owner: User){
 			}
 		}
 	}
+}
+
+
+section PointList-controller
+
+//http://localhost:8080/ToDoList/getList/[listId]
+
+service getList( listId: PointList ){
+		  var o := JSONObject();
+		  var writerList := List<String>();
+		  var readerList := List<String>();
+		  var pointList := List<String>();
+		  o.put( "id", listId.id );
+		  o.put( "name", listId.name);
+		  for (l in listId.writer){
+		  	writerList.add(l.id.toString());
+		  }
+		  for (l in listId.reader){
+		  	readerList.add(l.id.toString());
+		  }
+		  for (p in listId.pointGroups){
+		  	pointList.add(p.id.toString());
+		  }
+		  o.put( "owner", listId.owner.id.toString() );
+		  o.put( "writer",  JSONArray(writerList.toString()));
+		  o.put( "reader",  JSONArray(readerList.toString()));
+		  o.put("pointGroups", JSONArray(pointList.toString()));
+		  return o;
 }

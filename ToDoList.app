@@ -44,8 +44,9 @@ rule page imagePage(point:Point){
 
 access control rules
   // use page rules for services
-  rule page allUsers(){ true }
+  rule page allUsers(start:Int, size:Int){ true }
   rule page getUser( user: User ){ true }
+  rule page getList( listId: PointList  ){ true }
 
 //rule page *(*) {true} //For development purposes!
 
@@ -70,9 +71,9 @@ template startSite(){
 	var u:=securityContext.principal
 	headerLoggedIn(){
 		createList(u)
-		listContainer("Owner accsess lists",u.ownerList,u,true,false)
-		listContainer("Writer accsess lists",u.writeList,u,false,true)
-		listContainer("Reader accsess lists",u.readList,u,false,false)
+		listContainer("Owner access lists",u.ownerList,u,true,false)
+		listContainer("Writer access lists",u.writeList,u,false,true)
+		listContainer("Reader access lists",u.readList,u,false,false)
 	}
 }
 

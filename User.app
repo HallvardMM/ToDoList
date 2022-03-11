@@ -4,10 +4,14 @@
 
 module User
 
+native class java.util.UUID as UUID {
+	static fromString(String) : UUID
+}
+
 section User-model
 
 entity User{
-  name:: String (id, validate(name.length() > 0, "User needs name." ))
+  name:: String (id,validate(isUniqueUser(this), "User needs name." ), validate(name.length() > 0, "User needs name." ))
   password:: Secret ( validate(password.length() >= 10, "Minimum password length is 10." ) )
   email:: Email (not null)
   admin:: Bool
@@ -120,9 +124,9 @@ section User-controller
 
 
 //Used for the adminPage of the application
-service allUsers(){
+service allUsers(start:Int, size:Int){
   var a := JSONArray();
-  for( u: User order by u.name asc){
+  for( u: User order by u.name asc limit size offset start){
     var o := JSONObject();
     o.put( "id", u.id );
     o.put( "name", u.name );
@@ -136,16 +140,31 @@ service allUsers(){
 
 // GET parameters can be provided in the URL with:
 // servicename/arg1/arg2 or servicename?param1=arg1&param2=arg2
-// test with: curl http://localhost:8080/wpl-demo/getUser/[insert one of the ids]
+// test with: curl http://localhost:8080/ToDoList/getUser/[name]
+// Have to make sure that the user matches the logged in user
 
 service getUser( user: User ){
   var o := JSONObject();
+  var ol := List<String>();
+  var wl := List<String>();
+  var rl := List<String>();
   o.put( "id", user.id );
   o.put( "name", user.name );
   o.put( "email", user.email );
   o.put("admin",user.admin);
-  o.put("ownerList",user.ownerList.toString());
-  o.put("writeList",user.writeList.toString());
-  o.put("readList",user.readList.toString());
+   for (pl:PointList in user.ownerList){
+	  	ol.add(pl.id.toString());
+	  }
+	  
+	  for (l:PointList in user.writeList){
+	  	wl.add(l.id.toString());
+	  }
+	
+	  for (l:PointList in user.readList){
+	  	rl.add(l.id.toString());
+	  }
+	  o.put("ownerList",JSONArray(ol.toString()));
+	  o.put("writeList",JSONArray(wl.toString()));
+	  o.put("readList",JSONArray(rl.toString()));
   return o;
 }
