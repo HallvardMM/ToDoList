@@ -4,10 +4,6 @@
 
 module User
 
-native class java.util.UUID as UUID {
-	static fromString(String) : UUID
-}
-
 section User-model
 
 entity User{
@@ -98,16 +94,16 @@ page profilePage(u: User){
 	headerLoggedIn(){
 	h3{ "Profile" }
 	submit action{return root();}{"Return To Home Page"}
-	h5{"Mail change"}
+	h5{"Change mail"}
 	form [class="flexColumn"]{
 		input("Email", u.email)
 		input("Re-enter email", mailCheck)
 		validate(u.email == mailCheck, "The mailaddresses are not the same." )
-		input("Old Password", oldPasswordEmail)
-		validate(u.password.check(oldPasswordEmail), "Old password wrong")
+		input("Password", oldPasswordEmail)
+		validate(u.password.check(oldPasswordEmail), "Password wrong")
 		submit action{}[style:="width:300px"] { "Save" }
 		}
-	h5{"Password change"}
+	h5{"Change password"}
 	form [class="flexColumn"]{
 		input("Password",pass) 
 		validate(pass.length() >= 10, "Minimum password length is 10." )
@@ -166,5 +162,39 @@ service getUser( user: User ){
 	  o.put("ownerList",JSONArray(ol.toString()));
 	  o.put("writeList",JSONArray(wl.toString()));
 	  o.put("readList",JSONArray(rl.toString()));
+  return o;
+}
+
+service getUsersLists( user: User ){
+  var o := JSONObject();
+  var ol := JSONArray();
+  var wl := JSONArray();
+  var rl := JSONArray();
+   for (l:PointList in user.ownerList){
+   		var tmp := JSONObject();
+   		tmp.put("name",l.name);
+   		tmp.put("owner",l.owner.name.toString());
+   		tmp.put("id",l.id.toString());
+	  	ol.put(tmp);
+	  }
+	  
+	  for (l:PointList in user.writeList){
+	  	var tmp := JSONObject();
+   		tmp.put("name",l.name);
+   		tmp.put("owner",l.owner.name.toString());
+   		tmp.put("id",l.id.toString());
+	  	wl.put(tmp);
+	  }
+	
+	  for (l:PointList in user.readList){
+	  	var tmp := JSONObject();
+   		tmp.put("name",l.name);
+   		tmp.put("owner",l.owner.name.toString());
+   		tmp.put("id",l.id.toString());
+	  	rl.put(tmp);
+	  }
+	  o.put("ownerList",ol);
+	  o.put("writeList",wl);
+	  o.put("readList",rl);
   return o;
 }

@@ -47,6 +47,7 @@ access control rules
   rule page allUsers(start:Int, size:Int){ true }
   rule page getUser( user: User ){ true }
   rule page getList( listId: PointList  ){ true }
+  rule page getUsersLists( user: User ){true}
 
 //rule page *(*) {true} //For development purposes!
 
