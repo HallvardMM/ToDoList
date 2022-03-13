@@ -121,6 +121,8 @@ section User-controller
 
 //Used for the adminPage of the application
 service allUsers(start:Int, size:Int){
+  var main := JSONObject();
+  main.put("numberOfUsers", select count(*) from User);
   var a := JSONArray();
   for( u: User order by u.name asc limit size offset start){
     var o := JSONObject();
@@ -131,7 +133,8 @@ service allUsers(start:Int, size:Int){
     o.put( "created", u.created.toString() );
     a.put( o );
   }
-  return a;
+  main.put("users",a);
+  return main;
 }
 
 // GET parameters can be provided in the URL with:
@@ -170,7 +173,7 @@ service getUsersLists( user: User ){
   var ol := JSONArray();
   var wl := JSONArray();
   var rl := JSONArray();
-   for (l:PointList in user.ownerList){
+   for (l:PointList in user.ownerList order by l.name asc){
    		var tmp := JSONObject();
    		tmp.put("name",l.name);
    		tmp.put("owner",l.owner.name.toString());
@@ -178,7 +181,7 @@ service getUsersLists( user: User ){
 	  	ol.put(tmp);
 	  }
 	  
-	  for (l:PointList in user.writeList){
+	  for (l:PointList in user.writeList order by l.name asc){
 	  	var tmp := JSONObject();
    		tmp.put("name",l.name);
    		tmp.put("owner",l.owner.name.toString());
@@ -186,7 +189,7 @@ service getUsersLists( user: User ){
 	  	wl.put(tmp);
 	  }
 	
-	  for (l:PointList in user.readList){
+	  for (l:PointList in user.readList order by l.name asc){
 	  	var tmp := JSONObject();
    		tmp.put("name",l.name);
    		tmp.put("owner",l.owner.name.toString());
@@ -197,4 +200,25 @@ service getUsersLists( user: User ){
 	  o.put("writeList",wl);
 	  o.put("readList",rl);
   return o;
+}
+
+service createUserService(name: String,email: String,password: Secret){
+	//email and password length should be validated on client side
+	if(!isUniqueUserId(name)){
+		var o := JSONObject();
+		o.put("error","User exists!");
+		return o;
+	}else{
+	var u := User{};
+	u.name := name;
+	u.email := email;
+	if( (select count(*) from User) == 0 ){
+					u.admin := true;
+					}
+	u.password := password.digest(); 
+	u.save();
+	var o := JSONObject();
+		o.put("success","User created!");
+	return o;
+	}
 }

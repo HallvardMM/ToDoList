@@ -48,6 +48,9 @@ access control rules
   rule page getUser( user: User ){ true }
   rule page getList( listId: PointList  ){ true }
   rule page getUsersLists( user: User ){true}
+  rule page loginservice(name:String, pass:String){true}
+  rule page logoutservice( user: User ){true}
+  rule page createUserService(name: String,email: String,password: Secret){true}
 
 //rule page *(*) {true} //For development purposes!
 
@@ -193,7 +196,6 @@ template logintemplate() {
   // Where the user can sign Used instaed of authenticate
   var name: String
   var pass: Secret
-  var stayLoggedIn := false
   heading("ToDo List"){
   	div[class="startPagePadding"]{
   		h3{"Sign in"}
@@ -201,7 +203,6 @@ template logintemplate() {
   			grid{
   			  cell(12){ input("Name", name)}
 		      cell(12){ input("Password", pass)}
-		      cell(12){ switch("Stay logged in", stayLoggedIn)}
 		      cell(1){ div{submit signinAction() { "Login" } }}
 		      cell(2){ submit action{return createUser();}{"Create user"}}
   			}
@@ -211,7 +212,36 @@ template logintemplate() {
   
   action signinAction() {
     validate( authenticate(name,pass), "The login credentials are not valid." );
-    getSessionManager().stayLoggedIn := stayLoggedIn;
+	/* Tryed to implement stay logged in logic, but did not seem to work
+	   Cookie was saved regardles: https://github.com/webdsl/qa/blob/master/authentication.app
+		getSessionManager().stayLoggedIn;
+	*/
     return root();
   }
 }
+
+section authentication services
+
+service loginservice(name:String, pass:String){
+	//This should have some sort of encryption for password sending
+	// Will not implement
+	var main := JSONObject();
+	if(authenticate(name,pass)){
+		var user := getUniqueUser(name);
+		main.put("name",user.name);
+		main.put("admin",user.admin);
+		return main;
+	}
+	else{
+		main.put("error",true);
+		return main;
+	}
+}
+
+service logoutservice( user: User ){
+	var main := JSONObject();
+	securityContext.principal := null;
+	main.put("loggedout",true);	
+	return main;
+}
+
