@@ -52,3 +52,15 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 }
 
 
+section PointGroup-controller
+service createGroup(listId:PointList,groupName: String,sender: User){
+	var pg := PointGroup{};
+	pg.name :=groupName;
+	pg.parentList := listId;
+	listId.pointGroups.add(pg);
+	pg.save();
+	var o := JSONObject();
+		o.put("success","Point Group created!");
+	return o;
+}
+

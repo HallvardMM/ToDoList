@@ -137,6 +137,20 @@ service allUsers(start:Int, size:Int){
   return main;
 }
 
+//Used for the adminPage of the application
+service allUsersName(){
+  var main := JSONObject();
+  main.put("numberOfUsers", select count(*) from User);
+  var a := JSONArray();
+  for( u: User order by u.name){
+    var o := JSONObject();
+    o.put( "name", u.name );
+    a.put( o );
+  }
+  main.put("users",a);
+  return main;
+}
+
 // GET parameters can be provided in the URL with:
 // servicename/arg1/arg2 or servicename?param1=arg1&param2=arg2
 // test with: curl http://localhost:8080/ToDoList/getUser/[name]

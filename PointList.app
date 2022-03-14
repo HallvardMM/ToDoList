@@ -168,17 +168,76 @@ service getList( listId: PointList ){
 		  o.put( "id", listId.id );
 		  o.put( "name", listId.name);
 		  for (l in listId.writer){
-		  	writerList.add(l.id.toString());
+		  	writerList.add(l.name);
 		  }
 		  for (l in listId.reader){
-		  	readerList.add(l.id.toString());
+		  	readerList.add(l.name);
 		  }
 		  for (p in listId.pointGroups){
 		  	pointList.add(p.id.toString());
 		  }
-		  o.put( "owner", listId.owner.id.toString() );
+		  o.put( "owner", listId.owner.name );
 		  o.put( "writer",  JSONArray(writerList.toString()));
 		  o.put( "reader",  JSONArray(readerList.toString()));
 		  o.put("pointGroups", JSONArray(pointList.toString()));
 		  return o;
+}
+
+service createList( name: String, user:String ){
+	var u := getUniqueUser(user);
+	var p := PointList{};
+	p.name := name;
+	p.owner := u;
+	p.save();
+	var o := JSONObject();
+		o.put("success","List created!");
+	return o;
+}
+
+service deleteList( listId: PointList, user:User ){
+	listId.delete();
+	var o := JSONObject();
+		o.put("success","List deleted!");
+	return o;
+}
+
+service shareList( listId: PointList, owner:User, user:User, write:Bool ){
+	var o := JSONObject();
+	if(write){
+		if(user in listId.reader){
+			user.readList.remove(listId);
+			listId.reader.remove(user);
+		}
+		if(!(user in listId.writer)){
+			listId.writer.add(user);
+			user.writeList.add(listId);
+		}
+		o.put("success","Added to write list!");
+	}
+	else{
+		if(user in listId.writer){
+			user.writeList.remove(listId);
+			listId.writer.remove(user);
+		}
+		if(!(user in listId.reader)){
+		listId.reader.add(user);
+		user.readList.add(listId);
+		}
+		o.put("success","Added to read list!");
+	}	
+	return o;
+}
+
+service removeAccess( listId: PointList, owner:User, user:User){
+	var o := JSONObject();
+	if(user in listId.reader){
+			user.readList.remove(listId);
+			listId.reader.remove(user);
+		}
+	if(user in listId.writer){
+			user.writeList.remove(listId);
+			listId.writer.remove(user);
+		}
+	o.put("success","Removed from list!");
+	return o;
 }

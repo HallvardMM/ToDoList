@@ -51,6 +51,14 @@ access control rules
   rule page loginservice(name:String, pass:String){true}
   rule page logoutservice( user: User ){true}
   rule page createUserService(name: String,email: String,password: Secret){true}
+  rule page createList( name: String, user:String ){true}
+  rule page deleteList( listId: PointList, user:User ){listId.owner == user}
+  rule page allUsersName(){true}
+  rule page shareList( listId: PointList, owner:User, user:User, write:Bool ){listId.owner == owner}
+  rule page removeAccess( listId: PointList, owner:User, user:User){listId.owner == owner}
+  rule page createGroup(listId:PointList,groupName: String,sender: User){
+  	sender in listId.writer || sender == listId.owner
+  }
 
 //rule page *(*) {true} //For development purposes!
 
