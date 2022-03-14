@@ -61,7 +61,8 @@ access control rules
   }
 rule page changeEmail(name: User,email: Email,password: Secret){ securityContext.principal == name }
 rule page changePassword(name: User,newPassword: Secret, oldPassword: Secret){ securityContext.principal == name  }
-
+rule page fetchGroup(pgId:PointGroup,sender: User){true}
+rule page fetchAmountOfLists(asker: User){asker.admin}
 
 //rule page *(*) {true} //For development purposes!
 

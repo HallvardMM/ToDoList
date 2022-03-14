@@ -64,3 +64,20 @@ service createGroup(listId:PointList,groupName: String,sender: User){
 	return o;
 }
 
+service fetchGroup(pgId:PointGroup,sender: User){
+	var o := JSONObject();
+	var pointList := JSONArray();
+	o.put("name",pgId.name);
+	o.put("parentList",pgId.parentList.name);
+	for(point in pgId.points order by point.name asc){
+		var pointObject := JSONObject();
+		pointObject.put("name",point.name);
+		pointObject.put("id",point.id);
+		pointList.put(pointObject);
+	}
+	o.put("points",pointList);
+	return o;
+}
+
+
+

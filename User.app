@@ -136,6 +136,22 @@ service allUsers(){
   return main;
 }
 
+service fetchAmountOfLists(asker: User){
+	var main := JSONObject();
+	var a := JSONArray();
+	for( u: User order by u.name){
+	    var o := JSONObject();
+	    var data := JSONArray();
+	    data.put(u.ownerList.length);
+	    o.put( "name", u.name );
+	    o.put( "data", data );
+	    a.put( o );
+	  }
+	main.put("users",a);
+	return main;
+}
+
+
 //Used for the adminPage of the application
 service allUsersName(){
   var main := JSONObject();
