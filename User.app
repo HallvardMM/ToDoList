@@ -120,11 +120,10 @@ section User-controller
 
 
 //Used for the adminPage of the application
-service allUsers(start:Int, size:Int){
+service allUsers(){
   var main := JSONObject();
-  main.put("numberOfUsers", select count(*) from User);
   var a := JSONArray();
-  for( u: User order by u.name asc limit size offset start){
+  for( u: User order by u.name){
     var o := JSONObject();
     o.put( "id", u.id );
     o.put( "name", u.name );

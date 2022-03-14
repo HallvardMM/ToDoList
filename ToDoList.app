@@ -44,7 +44,7 @@ rule page imagePage(point:Point){
 
 access control rules
   // use page rules for services
-  rule page allUsers(start:Int, size:Int){ true }
+  rule page allUsers(){ true }
   rule page getUser( user: User ){ true }
   rule page getList( listId: PointList  ){ true }
   rule page getUsersLists( user: User ){true}
