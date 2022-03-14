@@ -59,6 +59,9 @@ access control rules
   rule page createGroup(listId:PointList,groupName: String,sender: User){
   	sender in listId.writer || sender == listId.owner
   }
+rule page changeEmail(name: User,email: Email,password: Secret){ securityContext.principal == name }
+rule page changePassword(name: User,newPassword: Secret, oldPassword: Secret){ securityContext.principal == name  }
+
 
 //rule page *(*) {true} //For development purposes!
 

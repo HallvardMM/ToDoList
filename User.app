@@ -236,3 +236,25 @@ service createUserService(name: String,email: String,password: Secret){
 	return o;
 	}
 }
+
+service changeEmail(name: User,email: Email,password: Secret){
+	var o := JSONObject();
+	if(authenticate(name.name,password)){
+		name.email := email;
+		o.put("success","Email changed!");
+	}else{
+		o.put("error","Wrong password");
+	}
+	return o;
+}
+
+service changePassword(name: User,newPassword: Secret, oldPassword: Secret){
+	var o := JSONObject();
+	if(authenticate(name.name,oldPassword)){
+		name.password := newPassword.digest();
+		o.put("success","Password changed!");
+	}else{
+		o.put("error","Wrong password");
+	}
+	return o;
+}
