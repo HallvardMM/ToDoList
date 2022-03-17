@@ -158,6 +158,29 @@ page accessListPage(p: PointList, owner: User){
 
 section PointList-controller
 
+function deleteList(list: PointList, u:User){
+	// Delete list if owner access 
+	for(w in list.writer){
+		w.writeList.remove(list);
+		}
+	for(r in list.reader){
+		r.readList.remove(list);
+	}
+	u.ownerList.remove(list);
+	list.delete(); 
+}
+
+function leaveList(list: PointList, u:User, writer:Bool){
+	// Leave a list if read/write access
+	if(writer){
+		list.writer.remove(u);
+		u.writeList.remove(list);
+	}else{
+		list.reader.remove(u);
+		u.readList.remove(list);
+	}	
+}
+
 //http://localhost:8080/ToDoList/getList/[listId]
 
 service getList( listId: PointList ){
@@ -218,7 +241,8 @@ service deleteList(listId: PointList){
 
 service shareList( listId: PointList, user:User, write:Bool ){
 	var o := JSONObject();
-	if(write){
+	if(user != securityContext.principal){
+		if(write){
 		if(user in listId.reader){
 			user.readList.remove(listId);
 			listId.reader.remove(user);
@@ -228,18 +252,24 @@ service shareList( listId: PointList, user:User, write:Bool ){
 			user.writeList.add(listId);
 		}
 		o.put("success","Added to write list!");
+		}
+		else{
+			if(user in listId.writer){
+				user.writeList.remove(listId);
+				listId.writer.remove(user);
+			}
+			if(!(user in listId.reader)){
+			listId.reader.add(user);
+			user.readList.add(listId);
+			}
+			o.put("success","Added to read list!");
+		}
+		o.put("success","Added to read list!");	
 	}
 	else{
-		if(user in listId.writer){
-			user.writeList.remove(listId);
-			listId.writer.remove(user);
-		}
-		if(!(user in listId.reader)){
-		listId.reader.add(user);
-		user.readList.add(listId);
-		}
-		o.put("success","Added to read list!");
-	}	
+		o.put("error","Cannot share with yourself!");
+	}
+	
 	return o;
 }
 

@@ -161,32 +161,6 @@ template createList(u:User){
 	}
 }
 
-section root-controlls
-
-function deleteList(list: PointList, u:User){
-	// Delete list if owner access 
-	for(w in list.writer){
-		w.writeList.remove(list);
-		}
-	for(r in list.reader){
-		r.readList.remove(list);
-	}
-	u.ownerList.remove(list);
-	list.delete(); 
-}
-
-function leaveList(list: PointList, u:User, writer:Bool){
-	// Leave a list if read/write access
-	if(writer){
-		list.writer.remove(u);
-		u.writeList.remove(list);
-	}else{
-		list.reader.remove(u);
-		u.readList.remove(list);
-	}	
-}
-
-
 section accessDeniedpages
 // Based on this repo: https://github.com/webdsl/cs4105-demo @Author: dgroenewegen 
 
@@ -244,14 +218,16 @@ service loginservice(){
         var name := json.getString("name");
 		var password: Secret := json.getString("password");
 		var main := JSONObject();
-		if(authenticate(name,password)){
+		if (findUser(name) != null){
+			if(authenticate(name,password)){
 			var user := getUniqueUser(name);
 			main.put("name",user.name);
 			main.put("admin",user.admin);
 			return main;
+			}
 		}
 		else{
-			main.put("error",true);
+			main.put("errorNamePass","Wrong username or password!");
 			return main;
 		}
 	}

@@ -69,7 +69,12 @@ page adminPage(){
 					output("Id: "+u.id)
 					label("Name: "){input(u.name)[not null]}
 					label("Email: "){input(u.email)}
-					label("Admin: "){input(u.admin)}
+					if(securityContext.principal==u){
+						div{output("Admin: ")}
+						div{output("Self")}
+					}else{
+						label("Admin: "){input(u.admin)}
+					}
 					output("Created: "+u.created)
 				    submit action{} { "Save" }
 				    }    
@@ -218,7 +223,7 @@ service createUserService(){
 	
 		if(!isUniqueUserId(name)){
 		var o := JSONObject();
-		o.put("error","User exists!");
+		o.put("exists","User exists!");
 		return o;
 		}else{
 		var u := User{};

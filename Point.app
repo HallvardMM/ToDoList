@@ -54,7 +54,12 @@ template showView(point: Point,writeAccess: Bool){
 		div[style:="overflow-wrap:break-word;"]{output( "URL: " + point.url )}
 		div{label("Due: "){output(point.dueTime )}} 
 		// Hard to do a null check here However it does not make an issue
-		label( "Image: " ){ navigate(imagePage(point)){ output(point.img.toString()) } }
+		if(point.img == null){
+			label( "Image: " ){ "No image" } 
+		}else{
+			label( "Image: " ){ navigate(imagePage(point)){ output(point.img.fileName()) } }
+		}
+		
 	}
 }
 
