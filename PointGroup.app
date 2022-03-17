@@ -53,7 +53,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 
 
 section PointGroup-controller
-service createGroup(listId:PointList,groupName: String,sender: User){
+service createGroup(listId:PointList,groupName: String){
 	var pg := PointGroup{};
 	pg.name :=groupName;
 	pg.parentList := listId;
@@ -64,7 +64,7 @@ service createGroup(listId:PointList,groupName: String,sender: User){
 	return o;
 }
 
-service fetchGroup(pgId:PointGroup,sender: User){
+service fetchGroup(pgId:PointGroup){
 	var o := JSONObject();
 	var pointList := JSONArray();
 	o.put("name",pgId.name);

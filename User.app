@@ -136,7 +136,7 @@ service allUsers(){
   return main;
 }
 
-service fetchAmountOfLists(asker: User){
+service fetchAmountOfLists(){
 	var main := JSONObject();
 	var a := JSONArray();
 	for( u: User order by u.name){
@@ -166,110 +166,110 @@ service allUsersName(){
   return main;
 }
 
-// GET parameters can be provided in the URL with:
-// servicename/arg1/arg2 or servicename?param1=arg1&param2=arg2
-// test with: curl http://localhost:8080/ToDoList/getUser/[name]
-// Have to make sure that the user matches the logged in user
-
-service getUser( user: User ){
-  var o := JSONObject();
-  var ol := List<String>();
-  var wl := List<String>();
-  var rl := List<String>();
-  o.put( "id", user.id );
-  o.put( "name", user.name );
-  o.put( "email", user.email );
-  o.put("admin",user.admin);
-   for (pl:PointList in user.ownerList){
-	  	ol.add(pl.id.toString());
-	  }
-	  
-	  for (l:PointList in user.writeList){
-	  	wl.add(l.id.toString());
-	  }
-	
-	  for (l:PointList in user.readList){
-	  	rl.add(l.id.toString());
-	  }
-	  o.put("ownerList",JSONArray(ol.toString()));
-	  o.put("writeList",JSONArray(wl.toString()));
-	  o.put("readList",JSONArray(rl.toString()));
-  return o;
+service getUsersLists(){
+	if(getHttpMethod() == "POST") {
+		var json := JSONObject(readRequestBody());
+		var name := json.getString("name");
+		var u := getUniqueUser(name);
+	    var o := JSONObject();
+		if(securityContext.principal==u){
+			var ol := JSONArray();
+		  	var wl := JSONArray();
+		  	var rl := JSONArray();
+	   		for (l:PointList in u.ownerList order by l.name asc){
+		   		var tmp := JSONObject();
+		   		tmp.put("name",l.name);
+		   		tmp.put("owner",l.owner.name.toString());
+		   		tmp.put("id",l.id.toString());
+			  	ol.put(tmp);
+			  }
+			for (l:PointList in u.writeList order by l.name asc){
+		  		var tmp := JSONObject();
+		   		tmp.put("name",l.name);
+		   		tmp.put("owner",l.owner.name.toString());
+		   		tmp.put("id",l.id.toString());
+			  	wl.put(tmp);
+			  }
+			  for (l:PointList in u.readList order by l.name asc){
+			  	var tmp := JSONObject();
+		   		tmp.put("name",l.name);
+		   		tmp.put("owner",l.owner.name.toString());
+		   		tmp.put("id",l.id.toString());
+			  	rl.put(tmp);
+			  }
+			  o.put("ownerList",ol);
+			  o.put("writeList",wl);
+			  o.put("readList",rl);
+		}
+		else{
+			o.put("error","Cannot fetch another users list");
+		}
+		  return o;
+	}
 }
 
-service getUsersLists( user: User ){
-  var o := JSONObject();
-  var ol := JSONArray();
-  var wl := JSONArray();
-  var rl := JSONArray();
-   for (l:PointList in user.ownerList order by l.name asc){
-   		var tmp := JSONObject();
-   		tmp.put("name",l.name);
-   		tmp.put("owner",l.owner.name.toString());
-   		tmp.put("id",l.id.toString());
-	  	ol.put(tmp);
-	  }
-	  
-	  for (l:PointList in user.writeList order by l.name asc){
-	  	var tmp := JSONObject();
-   		tmp.put("name",l.name);
-   		tmp.put("owner",l.owner.name.toString());
-   		tmp.put("id",l.id.toString());
-	  	wl.put(tmp);
-	  }
+service createUserService(){
+	//email and password length should also be validated on client side
+	if(getHttpMethod() == "POST") {
+	    var json := JSONObject(readRequestBody());
+	    var name := json.getString("name");
+		var email := json.getString("email");
+		var password : Secret := json.getString("password");
 	
-	  for (l:PointList in user.readList order by l.name asc){
-	  	var tmp := JSONObject();
-   		tmp.put("name",l.name);
-   		tmp.put("owner",l.owner.name.toString());
-   		tmp.put("id",l.id.toString());
-	  	rl.put(tmp);
-	  }
-	  o.put("ownerList",ol);
-	  o.put("writeList",wl);
-	  o.put("readList",rl);
-  return o;
-}
-
-service createUserService(name: String,email: String,password: Secret){
-	//email and password length should be validated on client side
-	if(!isUniqueUserId(name)){
+		if(!isUniqueUserId(name)){
 		var o := JSONObject();
 		o.put("error","User exists!");
 		return o;
-	}else{
-	var u := User{};
-	u.name := name;
-	u.email := email;
-	if( (select count(*) from User) == 0 ){
-					u.admin := true;
-					}
-	u.password := password.digest(); 
-	u.save();
-	var o := JSONObject();
-		o.put("success","User created!");
-	return o;
+		}else{
+		var u := User{};
+		u.name := name;
+		u.email := email;
+		if( (select count(*) from User) == 0 ){
+						u.admin := true;
+						}
+		u.password := password.digest(); 
+		u.save();
+		var o := JSONObject();
+			o.put("success","User created!");
+		return o;
+		}
 	}
 }
 
-service changeEmail(name: User,email: Email,password: Secret){
-	var o := JSONObject();
-	if(authenticate(name.name,password)){
-		name.email := email;
-		o.put("success","Email changed!");
-	}else{
-		o.put("error","Wrong password");
+service changeEmail(){
+	if(getHttpMethod() == "POST") {
+		var o := JSONObject();
+	    var json := JSONObject(readRequestBody());
+	    var name := json.getString("name");
+		var email := json.getString("email");
+		var password : Secret := json.getString("password");
+		var u := getUniqueUser(name);
+		if(securityContext.principal==u && u.password.check(password)){
+			u.email := email;
+			o.put("success","Email changed!");
+		}
+		else{
+			o.put("error","Wrong password");
+		}		
+		return o;
 	}
-	return o;
 }
 
-service changePassword(name: User,newPassword: Secret, oldPassword: Secret){
-	var o := JSONObject();
-	if(authenticate(name.name,oldPassword)){
-		name.password := newPassword.digest();
-		o.put("success","Password changed!");
-	}else{
-		o.put("error","Wrong password");
+service changePassword(){
+	// name: User,newPassword: Secret, oldPassword: Secret
+	if(getHttpMethod() == "POST") {
+		var o := JSONObject();
+	    var json := JSONObject(readRequestBody());
+	    var name := json.getString("name");
+		var newPassword : Secret := json.getString("newPassword");
+		var oldPassword : Secret := json.getString("oldPassword");
+		var u := getUniqueUser(name);
+		if(securityContext.principal==u && u.password.check(oldPassword)){
+			u.password := newPassword.digest();
+			o.put("success","Password changed!");
+		}else{
+			o.put("error","Wrong password");
+		}
+		return o;
 	}
-	return o;
 }

@@ -161,7 +161,8 @@ section PointList-controller
 //http://localhost:8080/ToDoList/getList/[listId]
 
 service getList( listId: PointList ){
-		  var o := JSONObject();
+	if(listId!=null){
+		var o := JSONObject();
 		  var writerList := List<String>();
 		  var readerList := List<String>();
 		  var pointList := List<String>();
@@ -180,28 +181,42 @@ service getList( listId: PointList ){
 		  o.put( "writer",  JSONArray(writerList.toString()));
 		  o.put( "reader",  JSONArray(readerList.toString()));
 		  o.put("pointGroups", JSONArray(pointList.toString()));
-		  return o;
+		  return o;	
+	}
 }
 
-service createList( name: String, user:String ){
-	var u := getUniqueUser(user);
-	var p := PointList{};
-	p.name := name;
-	p.owner := u;
-	p.save();
-	var o := JSONObject();
+service createList(){
+	if(getHttpMethod() == "POST") {
+	var json := JSONObject(readRequestBody());
+    var name := json.getString("name");
+    var listName := json.getString("listName");
+    var u := getUniqueUser(name);
+    var o := JSONObject();
+    if(securityContext.principal == u){
+    	var p := PointList{};
+		p.name := listName;
+		p.owner := u;
+		p.save();
+		
 		o.put("success","List created!");
-	return o;
+		return o;
+		}
+	else{
+    	o.put("error","Cannot create list for others!");
+		return o;
+    }
+    }
 }
 
-service deleteList( listId: PointList, user:User ){
-	listId.delete();
+service deleteList(listId: PointList){
 	var o := JSONObject();
-		o.put("success","List deleted!");
+	deleteList(listId, securityContext.principal);
+	o.put("success","List deleted!");
 	return o;
+
 }
 
-service shareList( listId: PointList, owner:User, user:User, write:Bool ){
+service shareList( listId: PointList, user:User, write:Bool ){
 	var o := JSONObject();
 	if(write){
 		if(user in listId.reader){
@@ -228,7 +243,7 @@ service shareList( listId: PointList, owner:User, user:User, write:Bool ){
 	return o;
 }
 
-service removeAccess( listId: PointList, owner:User, user:User){
+service removeAccess( listId: PointList, user:User){
 	var o := JSONObject();
 	if(user in listId.reader){
 			user.readList.remove(listId);

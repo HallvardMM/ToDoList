@@ -42,27 +42,31 @@ rule page imagePage(point:Point){
 	|| securityContext.principal in point.parentGroup.parentList.reader)
 }
 
-access control rules
   // use page rules for services
-  rule page allUsers(){ true }
-  rule page getUser( user: User ){ true }
-  rule page getList( listId: PointList  ){ true }
-  rule page getUsersLists( user: User ){true}
-  rule page loginservice(name:String, pass:String){true}
-  rule page logoutservice( user: User ){true}
-  rule page createUserService(name: String,email: String,password: Secret){true}
-  rule page createList( name: String, user:String ){true}
-  rule page deleteList( listId: PointList, user:User ){listId.owner == user}
-  rule page allUsersName(){true}
-  rule page shareList( listId: PointList, owner:User, user:User, write:Bool ){listId.owner == owner}
-  rule page removeAccess( listId: PointList, owner:User, user:User){listId.owner == owner}
-  rule page createGroup(listId:PointList,groupName: String,sender: User){
-  	sender in listId.writer || sender == listId.owner
+rule page allUsers(){ securityContext.principal.admin }
+rule page fetchAmountOfLists(){securityContext.principal.admin}
+rule page getUsersLists(){loggedIn()} //securityContext.principal==user check in function
+rule page getList( p: PointList  ){ 
+	(p.owner==securityContext.principal 
+	|| securityContext.principal in p.writer 
+	|| securityContext.principal in p.reader) }
+rule page loginservice(){!loggedIn()}
+rule page logoutservice( ){loggedIn()} // securityContext.principal == user check in function
+rule page createUserService(){!loggedIn()}
+rule page createList(){loggedIn()} //securityContext.principal == user check in function
+rule page deleteList(listId: PointList){listId.owner==securityContext.principal }
+rule page allUsersName(){loggedIn()}
+rule page shareList( listId: PointList, user:User, write:Bool ){listId.owner == securityContext.principal}
+rule page removeAccess( listId: PointList, user:User){listId.owner == securityContext.principal}
+rule page createGroup(listId:PointList,groupName: String){
+  	securityContext.principal in listId.writer || securityContext.principal == listId.owner
   }
-rule page changeEmail(name: User,email: Email,password: Secret){ securityContext.principal == name }
-rule page changePassword(name: User,newPassword: Secret, oldPassword: Secret){ securityContext.principal == name  }
-rule page fetchGroup(pgId:PointGroup,sender: User){true}
-rule page fetchAmountOfLists(asker: User){asker.admin}
+rule page changeEmail(){ loggedIn()} // securityContext.principal==u && u.password.check(password) in function
+rule page changePassword(){loggedIn()} //securityContext.principal==u && u.password.check(oldPassword)
+rule page fetchGroup(pgId:PointGroup){
+	(securityContext.principal == pgId.parentList.owner 
+	|| securityContext.principal in pgId.parentList.writer
+	|| securityContext.principal in pgId.parentList.reader)}
 
 //rule page *(*) {true} //For development purposes!
 
@@ -234,26 +238,39 @@ template logintemplate() {
 
 section authentication services
 
-service loginservice(name:String, pass:String){
-	//This should have some sort of encryption for password sending
-	// Will not implement
-	var main := JSONObject();
-	if(authenticate(name,pass)){
-		var user := getUniqueUser(name);
-		main.put("name",user.name);
-		main.put("admin",user.admin);
-		return main;
-	}
-	else{
-		main.put("error",true);
-		return main;
+service loginservice(){
+	if(getHttpMethod() == "POST") {
+		var json := JSONObject(readRequestBody());
+        var name := json.getString("name");
+		var password: Secret := json.getString("password");
+		var main := JSONObject();
+		if(authenticate(name,password)){
+			var user := getUniqueUser(name);
+			main.put("name",user.name);
+			main.put("admin",user.admin);
+			return main;
+		}
+		else{
+			main.put("error",true);
+			return main;
+		}
 	}
 }
 
-service logoutservice( user: User ){
+service logoutservice(){
+	if(getHttpMethod() == "POST") {
 	var main := JSONObject();
-	securityContext.principal := null;
-	main.put("loggedout",true);	
-	return main;
+	var json := JSONObject(readRequestBody());
+    var name := json.getString("name");
+    var user := getUniqueUser(name);
+    if(securityContext.principal == user){
+		//Do the check here since I do not want to send info about who
+		// is loging out across the web
+		securityContext.principal := null;
+		main.put("loggedOut",true);	
+		return main;
+     }
+	}
+	
 }
 
