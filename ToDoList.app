@@ -43,6 +43,7 @@ rule page imagePage(point:Point){
 }
 
   // use page rules for services
+rule page isLoggedIn(){true}
 rule page allUsers(){ securityContext.principal.admin }
 rule page fetchAmountOfLists(){securityContext.principal.admin}
 rule page getUsersLists(){loggedIn()} //securityContext.principal==user check in function
@@ -212,8 +213,21 @@ template logintemplate() {
 
 section authentication services
 
+service isLoggedIn(){
+	var main := JSONObject();
+	if(securityContext.principal != null){
+		main.put("name",securityContext.principal.name);
+		main.put("admin",securityContext.principal.admin);
+	}
+	else{
+		main.put("notLoggedIn",true);
+	}
+	return main;
+}
+
 service loginservice(){
 	if(getHttpMethod() == "POST") {
+		securityContext.principal := null;
 		var json := JSONObject(readRequestBody());
         var name := json.getString("name");
 		var password: Secret := json.getString("password");
