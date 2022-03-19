@@ -124,7 +124,7 @@ page profilePage(u: User){
 section User-controller
 
 
-//Used for the adminPage of the application
+//Used for the admin page of the application
 service allUsers(){
   var main := JSONObject();
   var a := JSONArray();
@@ -141,6 +141,7 @@ service allUsers(){
   return main;
 }
 
+//Used for the chart page of the application
 service fetchAmountOfLists(){
 	var main := JSONObject();
 	var a := JSONArray();
@@ -157,7 +158,7 @@ service fetchAmountOfLists(){
 }
 
 
-//Used for the adminPage of the application
+//Used for sharing lists with users
 service allUsersName(){
   var main := JSONObject();
   main.put("numberOfUsers", select count(*) from User);
@@ -171,6 +172,7 @@ service allUsersName(){
   return main;
 }
 
+//Used for the home page of the app
 service getUsersLists(){
 	if(getHttpMethod() == "POST") {
 		var json := JSONObject(readRequestBody());
@@ -261,7 +263,6 @@ service changeEmail(){
 }
 
 service changePassword(){
-	// name: User,newPassword: Secret, oldPassword: Secret
 	if(getHttpMethod() == "POST") {
 		var o := JSONObject();
 	    var json := JSONObject(readRequestBody());

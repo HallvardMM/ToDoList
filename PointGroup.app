@@ -53,6 +53,7 @@ template PointGroupTemplate(pg: PointGroup, writeAccess: Bool, owner: Bool){
 
 
 section PointGroup-controller
+
 service createGroup(listId:PointList,groupName: String){
 	var pg := PointGroup{};
 	pg.name :=groupName;
